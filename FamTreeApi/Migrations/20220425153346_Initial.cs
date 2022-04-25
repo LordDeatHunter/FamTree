@@ -21,13 +21,33 @@ namespace FamTreeApi.Migrations
                     CurrentName = table.Column<string>(type: "text", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeathDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Father = table.Column<int>(type: "integer", nullable: true),
-                    Mother = table.Column<int>(type: "integer", nullable: true)
+                    FatherId = table.Column<int>(type: "integer", nullable: true),
+                    MotherId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FamilyTree", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FamilyTree_FamilyTree_FatherId",
+                        column: x => x.FatherId,
+                        principalTable: "FamilyTree",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FamilyTree_FamilyTree_MotherId",
+                        column: x => x.MotherId,
+                        principalTable: "FamilyTree",
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FamilyTree_FatherId",
+                table: "FamilyTree",
+                column: "FatherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FamilyTree_MotherId",
+                table: "FamilyTree",
+                column: "MotherId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

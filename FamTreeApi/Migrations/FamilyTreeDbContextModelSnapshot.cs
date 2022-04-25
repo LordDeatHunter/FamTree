@@ -44,18 +44,37 @@ namespace FamTreeApi.Migrations
                     b.Property<DateTime?>("DeathDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("Father")
+                    b.Property<int?>("FatherId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Mother")
+                    b.Property<int?>("MotherId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FatherId");
+
+                    b.HasIndex("MotherId");
+
                     b.ToTable("FamilyTree");
+                });
+
+            modelBuilder.Entity("FamTreeApi.Models.FamilyMember", b =>
+                {
+                    b.HasOne("FamTreeApi.Models.FamilyMember", "Father")
+                        .WithMany()
+                        .HasForeignKey("FatherId");
+
+                    b.HasOne("FamTreeApi.Models.FamilyMember", "Mother")
+                        .WithMany()
+                        .HasForeignKey("MotherId");
+
+                    b.Navigation("Father");
+
+                    b.Navigation("Mother");
                 });
 #pragma warning restore 612, 618
         }
