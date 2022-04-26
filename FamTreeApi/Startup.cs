@@ -25,6 +25,7 @@ public class Startup
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
         services.AddControllers();
+        services.AddControllersWithViews();
         services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "FamTreeApi", Version = "v1" }));
     }
 
@@ -41,6 +42,7 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseRouting();
+        app.UseStaticFiles();
 
         app.UseAuthorization();
 
