@@ -39,19 +39,45 @@ public class FamilyMemberController : ControllerBase
 
     [HttpGet]
     [Route("get_parents")]
-    public List<FamilyMember> GetParents(int uuid)
+    public List<FamilyMember?> GetParents(int uuid)
     {
-        var person = _context.FamilyTree.FirstOrDefault(m => m.Id == uuid);
-        var parents = new List<FamilyMember>();
+        var person = _context.FamilyTree
+            .Include(m => m.Father)
+            .Include(m => m.Mother)
+            .FirstOrDefault(m => m.Id == uuid);
+        var parents = new List<FamilyMember?>();
         if (person == null) return parents;
-        var father =
-            _context.FamilyTree.FirstOrDefault(m =>
-                m.Gender == Male && person.Father != null && person.Father.Id == m.Id);
-        var mother = _context.FamilyTree.FirstOrDefault(m =>
-            m.Gender == Female && person.Mother != null && person.Mother.Id == m.Id);
-        if (father != null) parents.Add(father);
-        if (mother != null) parents.Add(mother);
+        var father = _context.FamilyTree
+            .FirstOrDefault(m => m.Gender == Male && person.Father != null && person.Father.Id == m.Id);
+        var mother = _context.FamilyTree
+            .FirstOrDefault(m => m.Gender == Female && person.Mother != null && person.Mother.Id == m.Id);
+        parents.Add(father);
+        parents.Add(mother);
         return parents;
+    }
+
+    [HttpGet]
+    [Route("get_father")]
+    public FamilyMember? GetFather(int uuid)
+    {
+        var person = _context.FamilyTree
+            .Include(m => m.Father)
+            .FirstOrDefault(m => m.Id == uuid);
+        if (person == null) return null;
+        return _context.FamilyTree
+            .FirstOrDefault(m => m.Gender == Male && person.Father != null && person.Father.Id == m.Id);
+    }
+
+    [HttpGet]
+    [Route("get_mother")]
+    public FamilyMember? GetMother(int uuid)
+    {
+        var person = _context.FamilyTree
+            .Include(m => m.Mother)
+            .FirstOrDefault(m => m.Id == uuid);
+        if (person == null) return null;
+        return _context.FamilyTree
+            .FirstOrDefault(m => m.Gender == Female && person.Mother != null && person.Mother.Id == m.Id);
     }
 
     [HttpGet]

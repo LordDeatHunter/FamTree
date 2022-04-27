@@ -1,6 +1,8 @@
-import {getAllFamilyMembers} from './dataFetch.js';
+import {getAllFamilyMembers, getParents} from './dataFetch.js';
 
 let editor;
+const xDistance = 150;
+const yDistance = 150;
 
 function onClick(e) {
     editor.dispatch('click', e);
@@ -65,8 +67,28 @@ function onClick(e) {
                 editor.connection_selected = null;
             }
             editor.editor_selected = true;
+            break;
         case 'input':
-
+            if (editor.ele_selected.classList.length < 2) break;
+            let id = editor.ele_selected.parentNode.parentNode.id.slice('node-'.length);
+            let currentNode = editor.getNodeFromId(id);
+            let type = editor.ele_selected.classList[1];
+            if (currentNode.inputs[type].connections.length > 0) {
+                floodRemove(id, [currentNode.inputs[type].connections[0].node]);
+                break;
+            }
+            getParents(id).then(parents => {
+                let parent;
+                if (type === 'input_1' && parents[0] != null) parent = parents[0]; else if (type === 'input_2' && parents[1] != null) parent = parents[1]; else return;
+                if (!(parent.id in editor.drawflow.drawflow.Home.data)) {
+                    editor.addNodeWithId(parent.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
+                        id: parent.id, name: parent.currentName, description: parent.birthName
+                    }));
+                    let parentNode = editor.getNodeFromId(parent.id);
+                    setPosition(parentNode, currentNode.pos_x, currentNode.pos_y, type);
+                }
+                editor.addConnection(parent.id, id, 'output_1', type)
+            });
             break;
         // case 'point':
         //     editor.drag_point = true;
@@ -98,6 +120,12 @@ function setup() {
     };
     editor.key = (_) => {
     };
+    editor.addNodeWithId = function (id, name, num_in, num_out, ele_pos_x, ele_pos_y, classoverride, data, html, typenode = false) {
+        const lastId = editor.nodeId;
+        editor.nodeId = id;
+        editor.addNode(name, num_in, num_out, ele_pos_x, ele_pos_y, classoverride, data, html, typenode)
+        editor.nodeId = lastId;
+    }
     const oldClick = editor.click;
     editor.click = (e) => {
         if (editor.editor_mode !== 'edit') {
@@ -116,50 +144,31 @@ function setup() {
     getAllFamilyMembers().then(data => {
         let ids = [];
         for (let member of data) {
-            editor.addNode(member.id, 2, 1, 500, 500, [], {}, getFamilyMemberCardHtml({
-                id: member.id,
-                name: member.currentName,
-                description: member.birthName
+            editor.addNodeWithId(member.id, 'ft', 2, 1, 500, 500, [], {}, getFamilyMemberCardHtml({
+                id: member.id, name: member.currentName, description: member.birthName
             }));
             ids.push(member.id);
         }
         for (let member of data) {
-            if (member.father in ids) editor.addConnection(member.father, member.id, 'output_1', 'input_1');
-            if (member.mother in ids) editor.addConnection(member.mother, member.id, 'output_1', 'input_2');
+            if (ids.includes(member.father)) editor.addConnection(member.father, member.id, 'output_1', 'input_1');
+            if (ids.includes(member.mother)) editor.addConnection(member.mother, member.id, 'output_1', 'input_2');
         }
         for (let member of data) {
-            let currentNode = editor.getNodeFromId(7);
+            let currentNode = editor.getNodeFromId(member.id);
             let [x, y] = [currentNode.pos_x, currentNode.pos_y];
-            if (member.father in ids) {
+            if (ids.includes(member.father)) {
                 setPositionRecursively(member.father, x, y, 'left');
             }
-            if (member.mother in ids) {
+            if (ids.includes(member.mother)) {
                 setPositionRecursively(member.mother, x, y, 'right');
             }
         }
     });
 }
 
-const xDistance = 150;
-const yDistance = 150;
-
 function setPositionRecursively(id, startX, startY, type) {
     let currentNode = editor.getNodeFromId(id);
-    let x = startX;
-    let y = startY;
-    if (type === 'left') {
-        x -= xDistance;
-        y -= yDistance;
-    } else if (type === 'right') {
-        x += xDistance;
-        y -= yDistance;
-    }
-    let nodeId = "node-" + id;
-    currentNode.pos_x = x;
-    currentNode.pos_y = y;
-    document.getElementById(nodeId).style.left = x + "px";
-    document.getElementById(nodeId).style.top = y + "px";
-    editor.updateConnectionNodes(nodeId);
+    let [x, y] = setPosition(currentNode, startX, startY, type);
     if (currentNode.inputs['input_1'].connections.length > 0) {
         setPositionRecursively(currentNode.inputs['input_1'].connections[0].node, x, y, 'left');
     }
@@ -168,6 +177,46 @@ function setPositionRecursively(id, startX, startY, type) {
     }
 }
 
+function setPosition(node, startX, startY, type) {
+    let nodeId = "node-" + node.id;
+    let x = startX;
+    let y = startY;
+    if (type === 'left' || type === 'input_1') {
+        x -= xDistance;
+        y -= yDistance;
+    } else if (type === 'right' || type === 'input_2') {
+        x += xDistance;
+        y -= yDistance;
+    }
+    // node.pos_x = x;
+    // node.pos_y = y;
+    editor.drawflow.drawflow.Home.data[node.id].pos_x = x;
+    editor.drawflow.drawflow.Home.data[node.id].pos_y = y;
+    document.getElementById(nodeId).style.left = x + "px";
+    document.getElementById(nodeId).style.top = y + "px";
+    editor.updateConnectionNodes(nodeId);
+    return [x, y];
+}
+
+function floodRemove(rootId, forRemoval) {
+    let visitQueue = [];
+    visitQueue.push(rootId);
+    for (let toRemove of forRemoval) {
+        editor.removeNodeId('node-' + toRemove);
+    }
+    for (let currentId of visitQueue) {
+        let currentNode = editor.getNodeFromId(currentId);
+
+        for (let c of [currentNode.inputs['input_1'].connections, currentNode.inputs['input_2'].connections, currentNode.outputs['output_1'].connections].flat()) {
+            if (visitQueue.includes(c.node)) continue;
+            visitQueue.push(c.node);
+        }
+    }
+    for (let removeId in editor.drawflow.drawflow.Home.data) {
+        if (visitQueue.includes(removeId)) continue;
+        editor.removeNodeId('node-' + removeId);
+    }
+}
 
 function getFamilyMemberCardHtml(data) {
     return `

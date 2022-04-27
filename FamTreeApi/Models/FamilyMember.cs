@@ -22,6 +22,7 @@ public class FamilyMember
         Gender = gender;
     }
 
+    // TODO: Change to string UUID
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
