@@ -29,7 +29,7 @@ public class FamilyMemberController : ControllerBase
 
     [HttpGet]
     [Route("get_member")]
-    public FamilyMember? GetFamilyMember(int uuid)
+    public FamilyMember? GetFamilyMember(Guid uuid)
     {
         return _context.FamilyTree
             .Include(m => m.Father)
@@ -39,7 +39,7 @@ public class FamilyMemberController : ControllerBase
 
     [HttpGet]
     [Route("get_parents")]
-    public List<FamilyMember?> GetParents(int uuid)
+    public List<FamilyMember?> GetParents(Guid uuid)
     {
         var person = _context.FamilyTree
             .Include(m => m.Father)
@@ -58,7 +58,7 @@ public class FamilyMemberController : ControllerBase
 
     [HttpGet]
     [Route("get_father")]
-    public FamilyMember? GetFather(int uuid)
+    public FamilyMember? GetFather(Guid uuid)
     {
         var person = _context.FamilyTree
             .Include(m => m.Father)
@@ -70,7 +70,7 @@ public class FamilyMemberController : ControllerBase
 
     [HttpGet]
     [Route("get_mother")]
-    public FamilyMember? GetMother(int uuid)
+    public FamilyMember? GetMother(Guid uuid)
     {
         var person = _context.FamilyTree
             .Include(m => m.Mother)
@@ -82,7 +82,7 @@ public class FamilyMemberController : ControllerBase
 
     [HttpGet]
     [Route("get_children")]
-    public List<FamilyMember> GetChildren(int uuid)
+    public List<FamilyMember> GetChildren(Guid uuid)
     {
         var person = _context.FamilyTree.FirstOrDefault(m => m.Id == uuid);
         return person == null
@@ -96,9 +96,10 @@ public class FamilyMemberController : ControllerBase
     [HttpPost]
     [Route("add_member")]
     public void AddMember(string birthName, string? currentName, DateTime birthDate, DateTime? deathDate, Gender gender,
-        int? fatherId, int? motherId)
+        Guid? fatherId, Guid? motherId)
     {
-        var familyMember = new FamilyMember(birthName, currentName, birthDate, deathDate, gender);
+        var familyMember = FamilyMember.createUniqueMember(birthName, currentName, birthDate, deathDate, gender, _context);
+
         if (fatherId != null)
         {
             familyMember.Father = _context.FamilyTree
@@ -117,10 +118,10 @@ public class FamilyMemberController : ControllerBase
 
     [HttpPost]
     [Route("modify_member")]
-    public void ModifyMember(int uuid, string? birthName, string? currentName, DateTime? birthDate,
+    public void ModifyMember(Guid uuid, string? birthName, string? currentName, DateTime? birthDate,
         DateTime? deathDate,
         Gender? gender,
-        int? fatherId, int? motherId)
+        Guid? fatherId, Guid? motherId)
     {
         var person = _context.FamilyTree
             .Include(m => m.Mother)
@@ -139,6 +140,7 @@ public class FamilyMemberController : ControllerBase
                 .FirstOrDefault(m => m.Id == fatherId && m.Gender == Male);
             Console.WriteLine(person.Father == null);
         }
+
         if (motherId != null)
         {
             person.Father = _context.FamilyTree

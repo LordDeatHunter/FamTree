@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -22,10 +23,21 @@ public class FamilyMember
         Gender = gender;
     }
 
-    // TODO: Change to string UUID
+    public static FamilyMember createUniqueMember(string birthName, string? currentName, DateTime birthDate,
+        DateTime? deathDate, Gender gender, FamilyTreeDbContext db)
+    {
+        var person = new FamilyMember(birthName, currentName, birthDate, deathDate, gender);
+        while (db.FamilyTree.Any(m => person.Id == m.Id))
+        {
+            person.Id = Guid.NewGuid();
+        }
+
+        return person;
+    }
+
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public Gender Gender { get; set; }

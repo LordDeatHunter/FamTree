@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -14,15 +13,14 @@ namespace FamTreeApi.Migrations
                 name: "FamilyTree",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     BirthName = table.Column<string>(type: "text", nullable: false),
                     CurrentName = table.Column<string>(type: "text", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeathDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    FatherId = table.Column<int>(type: "integer", nullable: true),
-                    MotherId = table.Column<int>(type: "integer", nullable: true)
+                    FatherId = table.Column<Guid>(type: "uuid", nullable: true),
+                    MotherId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {

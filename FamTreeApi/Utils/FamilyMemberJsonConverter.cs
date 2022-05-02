@@ -11,5 +11,5 @@ public class FamilyMemberJsonConverter : JsonConverter<FamilyMember>
         throw new NotImplementedException();
 
     public override void Write(Utf8JsonWriter writer, FamilyMember value, JsonSerializerOptions options) =>
-        writer.WriteNumberValue(value.Id);
+        writer.WriteStringValue(value.Id);
 }

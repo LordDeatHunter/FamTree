@@ -24,11 +24,9 @@ namespace FamTreeApi.Migrations
 
             modelBuilder.Entity("FamTreeApi.Models.FamilyMember", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("timestamp with time zone");
@@ -44,14 +42,14 @@ namespace FamTreeApi.Migrations
                     b.Property<DateTime?>("DeathDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("FatherId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("FatherId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("MotherId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("MotherId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
