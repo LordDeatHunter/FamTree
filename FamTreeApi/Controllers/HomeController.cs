@@ -3,6 +3,7 @@
 namespace FamTreeApi.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("/")]
 public class HomeController : Controller
 {
