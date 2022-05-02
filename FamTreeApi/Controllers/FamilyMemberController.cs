@@ -95,12 +95,15 @@ public class FamilyMemberController : ControllerBase
 
     [HttpPost]
     [Route("add_member")]
-    public void AddMember(string birthName, string? currentName, string? birthLocation, string? currentLocation,
-        DateTime birthDate, DateTime? deathDate, Gender gender, string? note,
+    public void AddMember(string birthName, string? currentName, string? birthLocation,
+        string? currentLocation, DateTime? birthDate,
+        DateTime? deathDate, Gender gender, string? note,
         Guid? fatherId, Guid? motherId)
     {
+        DateOnly? birthDateOnly = birthDate == null ? null : DateOnly.FromDateTime(birthDate.Value);
+        DateOnly? deathDateOnly = deathDate == null ? null : DateOnly.FromDateTime(deathDate.Value);
         var familyMember = FamilyMember.CreateUniqueMember(birthName, currentName, birthLocation, currentLocation,
-            birthDate, deathDate, gender, note, _context);
+            birthDateOnly, deathDateOnly, gender, note, _context);
 
         if (fatherId != null)
         {
@@ -120,9 +123,10 @@ public class FamilyMemberController : ControllerBase
 
     [HttpPost]
     [Route("modify_member")]
-    public void ModifyMember(Guid uuid, string? birthName, string? currentName, DateTime? birthDate,
+    public void ModifyMember(Guid uuid, string? birthName, string? currentName, string? birthLocation,
+        string? currentLocation, DateTime? birthDate,
         DateTime? deathDate,
-        Gender? gender,
+        Gender? gender, string? note,
         Guid? fatherId, Guid? motherId)
     {
         var person = _context.FamilyTree
@@ -132,9 +136,12 @@ public class FamilyMemberController : ControllerBase
         if (person == null) return;
         if (birthName != null) person.BirthName = birthName;
         if (currentName != null) person.CurrentName = currentName;
-        if (birthDate != null) person.BirthDate = (DateTime)birthDate;
-        if (deathDate != null) person.DeathDate = deathDate;
+        if (birthLocation != null) person.BirthLocation = birthLocation;
+        if (currentLocation != null) person.CurrentLocation = currentLocation;
+        if (birthDate != null) person.BirthDate = DateOnly.FromDateTime(birthDate.Value);
+        if (deathDate != null) person.DeathDate = DateOnly.FromDateTime(deathDate.Value);
         if (gender != null) person.Gender = (Gender)gender;
+        if (note != null) person.Note = note;
         if (fatherId != null)
         {
             Console.WriteLine(person.Father == null);

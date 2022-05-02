@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FamTreeApi.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    [Migration("20220502194324_Initial")]
+    [Migration("20220502195051_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,11 +30,10 @@ namespace FamTreeApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("BirthDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("BirthLocation")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BirthName")
@@ -42,15 +41,14 @@ namespace FamTreeApi.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("CurrentLocation")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("CurrentName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("DeathDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("DeathDate")
+                        .HasColumnType("date");
 
                     b.Property<Guid?>("FatherId")
                         .HasColumnType("uuid");
