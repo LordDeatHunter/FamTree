@@ -95,7 +95,7 @@ public class FamilyMemberController : ControllerBase
 
     [HttpPost]
     [Route("add_member")]
-    public void Post(string birthName, string? currentName, DateTime birthDate, DateTime? deathDate, Gender gender,
+    public void AddMember(string birthName, string? currentName, DateTime birthDate, DateTime? deathDate, Gender gender,
         int? fatherId, int? motherId)
     {
         var familyMember = new FamilyMember(birthName, currentName, birthDate, deathDate, gender);
@@ -112,6 +112,40 @@ public class FamilyMemberController : ControllerBase
         }
 
         _context.FamilyTree.Add(familyMember);
+        _context.SaveChanges();
+    }
+
+    [HttpPost]
+    [Route("modify_member")]
+    public void ModifyMember(int uuid, string? birthName, string? currentName, DateTime? birthDate,
+        DateTime? deathDate,
+        Gender? gender,
+        int? fatherId, int? motherId)
+    {
+        var person = _context.FamilyTree
+            .Include(m => m.Mother)
+            .Include(m => m.Father)
+            .FirstOrDefault(m => m.Id == uuid);
+        if (person == null) return;
+        if (birthName != null) person.BirthName = birthName;
+        if (currentName != null) person.CurrentName = currentName;
+        if (birthDate != null) person.BirthDate = (DateTime)birthDate;
+        if (deathDate != null) person.DeathDate = deathDate;
+        if (gender != null) person.Gender = (Gender)gender;
+        if (fatherId != null)
+        {
+            Console.WriteLine(person.Father == null);
+            person.Father = _context.FamilyTree
+                .FirstOrDefault(m => m.Id == fatherId && m.Gender == Male);
+            Console.WriteLine(person.Father == null);
+        }
+        if (motherId != null)
+        {
+            person.Father = _context.FamilyTree
+                .FirstOrDefault(m => m.Id == fatherId && m.Gender == Male);
+        }
+
+        _context.FamilyTree.Update(person);
         _context.SaveChanges();
     }
 }
