@@ -14,19 +14,25 @@ public class FamilyMember
     {
     }
 
-    public FamilyMember(string birthName, string? currentName, DateTime birthDate, DateTime? deathDate, Gender gender)
+    public FamilyMember(string birthName, string? currentName, string? birthLocation, string? currentLocation,
+        DateTime? birthDate, DateTime? deathDate, Gender gender, string? note)
     {
         BirthName = birthName;
         CurrentName = currentName ?? birthName;
-        BirthDate = birthDate.ToUniversalTime();
+        BirthLocation = birthLocation ?? "Unknown Location";
+        CurrentLocation = currentLocation ?? BirthLocation;
+        BirthDate = birthDate?.ToUniversalTime();
         DeathDate = deathDate?.ToUniversalTime();
         Gender = gender;
+        Note = note;
     }
 
-    public static FamilyMember createUniqueMember(string birthName, string? currentName, DateTime birthDate,
-        DateTime? deathDate, Gender gender, FamilyTreeDbContext db)
+    public static FamilyMember CreateUniqueMember(string birthName, string? currentName, string? birthLocation,
+        string? currentLocation, DateTime? birthDate,
+        DateTime? deathDate, Gender gender, string? note, FamilyTreeDbContext db)
     {
-        var person = new FamilyMember(birthName, currentName, birthDate, deathDate, gender);
+        var person = new FamilyMember(birthName, currentName, birthLocation, currentLocation, birthDate, deathDate,
+            gender, note);
         while (db.FamilyTree.Any(m => person.Id == m.Id))
         {
             person.Id = Guid.NewGuid();
@@ -45,16 +51,19 @@ public class FamilyMember
     public string BirthName { get; set; }
     public string CurrentName { get; set; }
 
-    public DateTime BirthDate { get; set; }
+    public string? BirthLocation { get; set; }
+    public string? CurrentLocation { get; set; }
+
+    public DateTime? BirthDate { get; set; }
     public DateTime? DeathDate { get; set; }
+
+    public string? Note { get; set; }
 
     [ForeignKey("FatherId")]
     [JsonConverter(typeof(FamilyMemberJsonConverter))]
     public FamilyMember? Father { get; set; }
-    //[ForeignKey("FatherId")] public int? Father { get; set; }
 
     [ForeignKey("MotherId")]
     [JsonConverter(typeof(FamilyMemberJsonConverter))]
     public FamilyMember? Mother { get; set; }
-    //[ForeignKey("MotherId")] public int? Mother { get; set; }
 }

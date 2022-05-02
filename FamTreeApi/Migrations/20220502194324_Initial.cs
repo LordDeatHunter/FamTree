@@ -17,8 +17,11 @@ namespace FamTreeApi.Migrations
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     BirthName = table.Column<string>(type: "text", nullable: false),
                     CurrentName = table.Column<string>(type: "text", nullable: false),
+                    BirthLocation = table.Column<string>(type: "text", nullable: false),
+                    CurrentLocation = table.Column<string>(type: "text", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeathDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Note = table.Column<string>(type: "text", nullable: true),
                     FatherId = table.Column<Guid>(type: "uuid", nullable: true),
                     MotherId = table.Column<Guid>(type: "uuid", nullable: true)
                 },

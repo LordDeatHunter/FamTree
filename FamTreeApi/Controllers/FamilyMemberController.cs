@@ -95,10 +95,12 @@ public class FamilyMemberController : ControllerBase
 
     [HttpPost]
     [Route("add_member")]
-    public void AddMember(string birthName, string? currentName, DateTime birthDate, DateTime? deathDate, Gender gender,
+    public void AddMember(string birthName, string? currentName, string? birthLocation, string? currentLocation,
+        DateTime birthDate, DateTime? deathDate, Gender gender, string? note,
         Guid? fatherId, Guid? motherId)
     {
-        var familyMember = FamilyMember.createUniqueMember(birthName, currentName, birthDate, deathDate, gender, _context);
+        var familyMember = FamilyMember.CreateUniqueMember(birthName, currentName, birthLocation, currentLocation,
+            birthDate, deathDate, gender, note, _context);
 
         if (fatherId != null)
         {

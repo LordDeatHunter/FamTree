@@ -31,7 +31,15 @@ namespace FamTreeApi.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("BirthLocation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("BirthName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CurrentLocation")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -50,6 +58,9 @@ namespace FamTreeApi.Migrations
 
                     b.Property<Guid?>("MotherId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
