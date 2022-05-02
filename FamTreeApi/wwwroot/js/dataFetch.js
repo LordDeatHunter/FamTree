@@ -14,3 +14,7 @@ export async function getParents(uuid) {
     let response = await fetch(`${window.location.origin}/api/familytree/get_parents?uuid=${uuid}`)
     return await response.json();
 }
+export async function getChildren(uuid) {
+    let response = await fetch(`${window.location.origin}/api/familytree/get_children?uuid=${uuid}`)
+    return await response.json();
+}

@@ -1,10 +1,10 @@
-import {getAllFamilyMembers, getParents} from './dataFetch.js';
+import {getAllFamilyMembers, getParents, getChildren} from './dataFetch.js';
 
 let editor;
 const xDistance = 150;
 const yDistance = 150;
 
-function onClick(e) {
+async function onClick(e) {
     editor.dispatch('click', e);
 
     editor.first_click = e.target;
@@ -14,6 +14,9 @@ function onClick(e) {
         editor.ele_selected = e.target.closest(".drawflow_content_node").parentElement;
     }
 
+    let id;
+    let currentNode;
+    let type;
     switch (editor.ele_selected.classList[0]) {
         case 'drawflow-node':
             if (editor.node_selected != null) {
@@ -70,25 +73,64 @@ function onClick(e) {
             break;
         case 'input':
             if (editor.ele_selected.classList.length < 2) break;
-            let id = editor.ele_selected.parentNode.parentNode.id.slice('node-'.length);
-            let currentNode = editor.getNodeFromId(id);
-            let type = editor.ele_selected.classList[1];
+            id = editor.ele_selected.parentNode.parentNode.id.slice('node-'.length);
+            currentNode = editor.getNodeFromId(id);
+            type = editor.ele_selected.classList[1];
             if (currentNode.inputs[type].connections.length > 0) {
                 floodRemove(id, [currentNode.inputs[type].connections[0].node]);
                 break;
             }
+            let parent;
             getParents(id).then(parents => {
-                let parent;
-                if (type === 'input_1' && parents[0] != null) parent = parents[0]; else if (type === 'input_2' && parents[1] != null) parent = parents[1]; else return;
-                if (!(parent.id in editor.drawflow.drawflow.Home.data)) {
+                if (type === 'input_1' && parents[0] != null) parent = parents[0];
+                else if (type === 'input_2' && parents[1] != null) parent = parents[1];
+                else return;
+                console.log(parent);
+                if (!nodeExists(parent.id)) {
                     editor.addNodeWithId(parent.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
                         id: parent.id, name: parent.currentName, description: parent.birthName
                     }));
                     let parentNode = editor.getNodeFromId(parent.id);
                     setPosition(parentNode, currentNode.pos_x, currentNode.pos_y, type);
                 }
-                editor.addConnection(parent.id, id, 'output_1', type)
+                getChildren(parent.id).then(children => children.forEach(child => {
+                    if (!nodeExists(child.id)) return;
+                    if (nodeExists(child.father)) {
+                        editor.addConnection(child.father, child.id, 'output_1', 'input_1');
+                    }
+                    if (nodeExists(child.mother)) {
+                        editor.addConnection(child.mother, child.id, 'output_1', 'input_2');
+                    }
+                }));
             });
+            break;
+        case 'output':
+            if (editor.ele_selected.classList.length < 2) break;
+            id = editor.ele_selected.parentNode.parentNode.id.slice('node-'.length);
+            currentNode = editor.getNodeFromId(id);
+            type = editor.ele_selected.classList[1];
+            // TODO: If the current node has children, check if all of them are shown
+            if (currentNode.outputs[type].connections.length > 0) {
+                floodRemove(id, currentNode.outputs[type].connections.map(c => c.node));
+                break;
+            }
+            let childIndex = -1;
+            getChildren(id).then(children => children.forEach(child => {
+                if (!nodeExists(child.id)) {
+                    editor.addNodeWithId(child.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
+                        id: child.id, name: child.currentName, description: child.birthName
+                    }));
+                    let childNode = editor.getNodeFromId(child.id);
+                    setPosition(childNode, currentNode.pos_x, currentNode.pos_y, type, childIndex * (xDistance + 50));
+                }
+                if (nodeExists(child.father)) {
+                    editor.addConnection(child.father, child.id, 'output_1', 'input_1');
+                }
+                if (nodeExists(child.mother)) {
+                    editor.addConnection(child.mother, child.id, 'output_1', 'input_2');
+                }
+                ++childIndex;
+            }));
             break;
         // case 'point':
         //     editor.drag_point = true;
@@ -166,6 +208,11 @@ function setup() {
     });
 }
 
+function nodeExists(id) {
+    return id in editor.drawflow.drawflow.Home.data;
+}
+
+
 function setPositionRecursively(id, startX, startY, type) {
     let currentNode = editor.getNodeFromId(id);
     let [x, y] = setPosition(currentNode, startX, startY, type);
@@ -177,7 +224,7 @@ function setPositionRecursively(id, startX, startY, type) {
     }
 }
 
-function setPosition(node, startX, startY, type) {
+function setPosition(node, startX, startY, type = '', xOffset = 0, yOffset = 0) {
     let nodeId = "node-" + node.id;
     let x = startX;
     let y = startY;
@@ -187,7 +234,12 @@ function setPosition(node, startX, startY, type) {
     } else if (type === 'right' || type === 'input_2') {
         x += xDistance;
         y -= yDistance;
+    } else if (type.includes('output')) {
+        x = xDistance;
+        y += yDistance;
     }
+    x += xOffset;
+    y += yOffset;
     // node.pos_x = x;
     // node.pos_y = y;
     editor.drawflow.drawflow.Home.data[node.id].pos_x = x;
