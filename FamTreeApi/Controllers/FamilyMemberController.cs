@@ -144,16 +144,14 @@ public class FamilyMemberController : ControllerBase
         if (note != null) person.Note = note;
         if (fatherId != null)
         {
-            Console.WriteLine(person.Father == null);
             person.Father = _context.FamilyTree
                 .FirstOrDefault(m => m.Id == fatherId && m.Gender == Male);
-            Console.WriteLine(person.Father == null);
         }
 
         if (motherId != null)
         {
-            person.Father = _context.FamilyTree
-                .FirstOrDefault(m => m.Id == fatherId && m.Gender == Male);
+            person.Mother = _context.FamilyTree
+                .FirstOrDefault(m => m.Id == motherId && m.Gender == Female);
         }
 
         _context.FamilyTree.Update(person);
