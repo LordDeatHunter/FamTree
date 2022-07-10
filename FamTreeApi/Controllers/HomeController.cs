@@ -13,4 +13,10 @@ public class HomeController : Controller
     {
         return View("/Views/Home.cshtml");
     }
+    [HttpGet]
+    [Route("/input")]
+    public IActionResult Input()
+    {
+        return View("/Views/InputTest.cshtml");
+    }
 }

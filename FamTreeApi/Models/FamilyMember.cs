@@ -49,7 +49,7 @@ public class FamilyMember
     public Gender Gender { get; set; }
 
     public string BirthName { get; set; }
-    public string CurrentName { get; set; }
+    public string? CurrentName { get; set; }
 
     public string? BirthLocation { get; set; }
     public string? CurrentLocation { get; set; }
@@ -66,4 +66,9 @@ public class FamilyMember
     [ForeignKey("MotherId")]
     [JsonConverter(typeof(FamilyMemberJsonConverter))]
     public FamilyMember? Mother { get; set; }
+
+    public override string ToString()
+    {
+        return $"{BirthName} | {CurrentName}, {Gender} from {BirthLocation}, {CurrentLocation}, {BirthDate} to {DeathDate}";
+    }
 }

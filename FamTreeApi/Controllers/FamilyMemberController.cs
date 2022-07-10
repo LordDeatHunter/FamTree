@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FamTreeApi.Models;
-using FamTreeApi.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static FamTreeApi.Utils.Gender;
@@ -95,27 +94,15 @@ public class FamilyMemberController : ControllerBase
 
     [HttpPost]
     [Route("add_member")]
-    public void AddMember(string birthName, string? currentName, string? birthLocation,
-        string? currentLocation, DateTime? birthDate,
-        DateTime? deathDate, Gender gender, string? note,
-        Guid? fatherId, Guid? motherId)
+    public void AddMember([FromBody] FamilyMember member)
     {
-        DateOnly? birthDateOnly = birthDate == null ? null : DateOnly.FromDateTime(birthDate.Value);
-        DateOnly? deathDateOnly = deathDate == null ? null : DateOnly.FromDateTime(deathDate.Value);
-        var familyMember = FamilyMember.CreateUniqueMember(birthName, currentName, birthLocation, currentLocation,
-            birthDateOnly, deathDateOnly, gender, note, _context);
+        var birthDateOnly = member.BirthDate;
+        var deathDateOnly = member.DeathDate;
+        var familyMember = FamilyMember.CreateUniqueMember(member.BirthName, member.CurrentName, member.BirthLocation,
+            member.CurrentLocation, birthDateOnly, deathDateOnly, member.Gender, member.Note, _context);
 
-        if (fatherId != null)
-        {
-            familyMember.Father = _context.FamilyTree
-                .FirstOrDefault(m => m.Id == fatherId && m.Gender == Male);
-        }
-
-        if (motherId != null)
-        {
-            familyMember.Mother = _context.FamilyTree
-                .FirstOrDefault(m => m.Id == motherId && m.Gender == Female);
-        }
+        if (member.Father != null) familyMember.Father = member.Father;
+        if (member.Mother != null) familyMember.Mother = member.Mother;
 
         _context.FamilyTree.Add(familyMember);
         _context.SaveChanges();
@@ -123,36 +110,23 @@ public class FamilyMemberController : ControllerBase
 
     [HttpPost]
     [Route("modify_member")]
-    public void ModifyMember(Guid uuid, string? birthName, string? currentName, string? birthLocation,
-        string? currentLocation, DateTime? birthDate,
-        DateTime? deathDate,
-        Gender? gender, string? note,
-        Guid? fatherId, Guid? motherId)
+    public void ModifyMember(FamilyMember member)
     {
         var person = _context.FamilyTree
             .Include(m => m.Mother)
             .Include(m => m.Father)
-            .FirstOrDefault(m => m.Id == uuid);
+            .FirstOrDefault(m => m.Id == member.Id);
         if (person == null) return;
-        if (birthName != null) person.BirthName = birthName;
-        if (currentName != null) person.CurrentName = currentName;
-        if (birthLocation != null) person.BirthLocation = birthLocation;
-        if (currentLocation != null) person.CurrentLocation = currentLocation;
-        if (birthDate != null) person.BirthDate = DateOnly.FromDateTime(birthDate.Value);
-        if (deathDate != null) person.DeathDate = DateOnly.FromDateTime(deathDate.Value);
-        if (gender != null) person.Gender = (Gender)gender;
-        if (note != null) person.Note = note;
-        if (fatherId != null)
-        {
-            person.Father = _context.FamilyTree
-                .FirstOrDefault(m => m.Id == fatherId && m.Gender == Male);
-        }
-
-        if (motherId != null)
-        {
-            person.Mother = _context.FamilyTree
-                .FirstOrDefault(m => m.Id == motherId && m.Gender == Female);
-        }
+        person.BirthName = member.BirthName;
+        person.CurrentName = member.CurrentName;
+        if (member.BirthLocation != null) person.BirthLocation = member.BirthLocation;
+        if (member.CurrentLocation != null) person.CurrentLocation = member.CurrentLocation;
+        if (member.BirthDate != null) person.BirthDate = member.BirthDate;
+        if (member.DeathDate != null) person.DeathDate = member.DeathDate;
+        person.Gender = member.Gender;
+        if (member.Note != null) person.Note = member.Note;
+        if (member.Father != null) person.Father = member.Father;
+        if (member.Mother != null) person.Mother = member.Mother;
 
         _context.FamilyTree.Update(person);
         _context.SaveChanges();

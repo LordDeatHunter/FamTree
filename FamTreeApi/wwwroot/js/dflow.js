@@ -44,6 +44,7 @@ async function onClick(e) {
                     editor.drag = true;
                 }
             }
+            console.log(editor.node_selected.id);
             break;
         case 'parent-drawflow':
             if (editor.node_selected != null) {
