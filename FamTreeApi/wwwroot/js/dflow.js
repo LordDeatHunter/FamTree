@@ -86,7 +86,6 @@ async function onClick(e) {
                 if (type === 'input_1' && parents[0] != null) parent = parents[0];
                 else if (type === 'input_2' && parents[1] != null) parent = parents[1];
                 else return;
-                console.log(parent);
                 if (!nodeExists(parent.id)) {
                     editor.addNodeWithId(parent.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
                         id: parent.id, name: parent.currentName, description: parent.birthName
@@ -94,8 +93,14 @@ async function onClick(e) {
                     let parentNode = editor.getNodeFromId(parent.id);
                     setPosition(parentNode, currentNode.pos_x, currentNode.pos_y, type);
                 }
-                getChildren(parent.id).then(children => children.forEach(child => {
-                    if (!nodeExists(child.id)) return;
+                getChildren(parent.id).then(children => children.forEach((child, index) => {
+                    if (!nodeExists(child.id)) {
+                        editor.addNodeWithId(child.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
+                            id: child.id, name: child.currentName, description: child.birthName
+                        }));
+                        let childNode = editor.getNodeFromId(child.id);
+                        setPosition(childNode, currentNode.pos_x, currentNode.pos_y, '', index * (xDistance + 50));
+                    }
                     if (nodeExists(child.father)) {
                         editor.addConnection(child.father, child.id, 'output_1', 'input_1');
                     }
@@ -115,14 +120,13 @@ async function onClick(e) {
                 floodRemove(id, currentNode.outputs[type].connections.map(c => c.node));
                 break;
             }
-            let childIndex = -1;
-            getChildren(id).then(children => children.forEach(child => {
+            getChildren(id).then(children => children.forEach((child, index) => {
                 if (!nodeExists(child.id)) {
                     editor.addNodeWithId(child.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
                         id: child.id, name: child.currentName, description: child.birthName
                     }));
                     let childNode = editor.getNodeFromId(child.id);
-                    setPosition(childNode, currentNode.pos_x, currentNode.pos_y, type, childIndex * (xDistance + 50));
+                    setPosition(childNode, currentNode.pos_x, currentNode.pos_y, type, (index - 1) * (xDistance + 50));
                 }
                 if (nodeExists(child.father)) {
                     editor.addConnection(child.father, child.id, 'output_1', 'input_1');
@@ -130,7 +134,6 @@ async function onClick(e) {
                 if (nodeExists(child.mother)) {
                     editor.addConnection(child.mother, child.id, 'output_1', 'input_2');
                 }
-                ++childIndex;
             }));
             break;
         // case 'point':
