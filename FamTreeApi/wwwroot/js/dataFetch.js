@@ -23,8 +23,17 @@ export async function getChildren(uuid) {
     return await response.json();
 }
 
+export async function deleteMember(uuid) {
+    let response = await fetch(`${window.location.origin}/api/familytree/delete_member`, {
+        method: 'POST',
+        body: JSON.stringify(uuid),
+        headers: {"Content-type": "application/json; charset=UTF-8"}
+    })
+    return await response.json();
+}
+
 export async function addMember(birthName, currentName, birthLocation, currentLocation, birthDate, deathDate, gender, note, fatherId, motherId) {
-    let data = {birthName, gender};
+    const data = {birthName, gender};
     if (!!currentName) data.currentName = currentName;
     if (!!birthLocation) data.birthLocation = birthLocation;
     if (!!currentLocation) data.currentLocation = currentLocation;
@@ -34,7 +43,6 @@ export async function addMember(birthName, currentName, birthLocation, currentLo
     if (!!fatherId) data.father = fatherId;
     if (!!motherId) data.mother = motherId;
     let str = JSON.stringify(data);
-    console.log(str);
     let response = await fetch(`${window.location.origin}/api/familytree/add_member`, {
         method: 'POST',
         body: str,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using FamTreeApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -106,6 +107,17 @@ public class FamilyMemberController : ControllerBase
 
         _context.FamilyTree.Add(familyMember);
         _context.SaveChanges();
+    }
+
+    [HttpPost]
+    [Route("delete_member")]
+    public IActionResult DeleteMember([FromBody] string uuid)
+    {
+        var member = _context.FamilyTree.FirstOrDefault(m => m.Id.ToString() == uuid);
+        if (member == null) return NotFound(new { message = "Member not found" });
+        _context.FamilyTree.Remove(member);
+        _context.SaveChanges();
+        return Ok(new { message = "Member deleted" });
     }
 
     [HttpPost]

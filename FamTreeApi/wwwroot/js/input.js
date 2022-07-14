@@ -1,4 +1,4 @@
-﻿import {addMember} from './dataFetch.js';
+﻿import {addMember, deleteMember} from './dataFetch.js';
 
 function submitNewMember() {
     const birthName = document.getElementById("birth-name-input").value;
@@ -25,8 +25,14 @@ function submitNewMember() {
     );
 }
 
+function submitDeletion() {
+    const uuid = document.getElementById("delete-uuid-input")?.value;
+    deleteMember(uuid);
+}
+
 function setup() {
     document.getElementById('input-button').onclick = () => submitNewMember();
+    document.getElementById('delete-button').onclick = () => submitDeletion();
 }
 
 window.addEventListener('DOMContentLoaded', setup);

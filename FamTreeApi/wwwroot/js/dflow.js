@@ -21,7 +21,7 @@ async function onClick(e) {
         case 'drawflow-node':
             if (editor.node_selected != null) {
                 editor.node_selected.classList.remove("selected");
-                if (editor.node_selected != editor.ele_selected) {
+                if (editor.node_selected !== editor.ele_selected) {
                     editor.dispatch('nodeUnselected', true);
                 }
             }
@@ -30,7 +30,7 @@ async function onClick(e) {
                 editor.removeReouteConnectionSelected();
                 editor.connection_selected = null;
             }
-            if (editor.node_selected != editor.ele_selected) {
+            if (editor.node_selected !== editor.ele_selected) {
                 editor.dispatch('nodeSelected', editor.ele_selected.id.slice(5));
             }
             editor.node_selected = editor.ele_selected;
