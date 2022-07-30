@@ -17,8 +17,8 @@ public class Startup
         Configuration = configuration;
         StaticData.Configuration = configuration;
     }
-    
-    public IConfiguration Configuration { get; }
+
+    private IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -27,7 +27,6 @@ public class Startup
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
         services.AddControllers();
-        services.AddControllersWithViews();
         services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "FamTreeApi", Version = "v1" }));
     }
 
@@ -44,7 +43,6 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseRouting();
-        app.UseStaticFiles();
 
         app.UseAuthorization();
 
