@@ -1,4 +1,5 @@
-import {getAllFamilyMembers, getParents, getChildren} from './dataFetch.js';
+import Drawflow from '../FamtreeDrawflow/src/drawflow.js';
+import {getAllFamilyMembers, getChildren, getParents} from './dataFetch.js';
 
 let editor;
 const xDistance = 150;

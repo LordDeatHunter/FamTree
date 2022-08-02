@@ -1,0 +1,3 @@
+[submodule "FamTreeFrontend/src/FamtreeDrawflow"]
+	path = FamTreeFrontend/src/FamtreeDrawflow
+	url = git@github.com/FamtreeDrawflow.git
