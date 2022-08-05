@@ -5,157 +5,70 @@ let editor;
 const xDistance = 150;
 const yDistance = 150;
 
-async function onClick(e) {
-    editor.dispatch('click', e);
-
-    editor.first_click = e.target;
-    editor.ele_selected = e.target;
-
-    if (e.target.closest(".drawflow_content_node") != null) {
-        editor.ele_selected = e.target.closest(".drawflow_content_node").parentElement;
+async function onInputClick(e) {
+    if (this.ele_selected.classList.length < 2) return;
+    const id = this.ele_selected.parentNode.parentNode.id.slice('node-'.length);
+    const currentNode = this.getNodeFromId(id);
+    const type = this.ele_selected.classList[1];
+    if (currentNode.inputs[type].connections.length > 0) {
+        floodRemove(id, [currentNode.inputs[type].connections[0].node]);
+        return;
     }
-
-    let id;
-    let currentNode;
-    let type;
-    switch (editor.ele_selected.classList[0]) {
-        case 'drawflow-node':
-            if (editor.node_selected != null) {
-                editor.node_selected.classList.remove("selected");
-                if (editor.node_selected !== editor.ele_selected) {
-                    editor.dispatch('nodeUnselected', true);
-                }
-            }
-            if (editor.connection_selected != null) {
-                editor.connection_selected.classList.remove("selected");
-                editor.removeReouteConnectionSelected();
-                editor.connection_selected = null;
-            }
-            if (editor.node_selected !== editor.ele_selected) {
-                editor.dispatch('nodeSelected', editor.ele_selected.id.slice(5));
-            }
-            editor.node_selected = editor.ele_selected;
-            editor.node_selected.classList.add("selected");
-            if (!editor.draggable_inputs) {
-                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT' && e.target.hasAttribute('contenteditable') !== true) {
-                    editor.drag = true;
-                }
-            } else {
-                if (e.target.tagName !== 'SELECT') {
-                    editor.drag = true;
-                }
-            }
-            console.log(editor.node_selected.id);
-            break;
-        case 'parent-drawflow':
-            if (editor.node_selected != null) {
-                editor.node_selected.classList.remove("selected");
-                editor.node_selected = null;
-                editor.dispatch('nodeUnselected', true);
-            }
-            if (editor.connection_selected != null) {
-                editor.connection_selected.classList.remove("selected");
-                editor.removeReouteConnectionSelected();
-                editor.connection_selected = null;
-            }
-            editor.editor_selected = true;
-            break;
-        case 'drawflow':
-            if (editor.node_selected != null) {
-                editor.node_selected.classList.remove("selected");
-                editor.node_selected = null;
-                editor.dispatch('nodeUnselected', true);
-            }
-            if (editor.connection_selected != null) {
-                editor.connection_selected.classList.remove("selected");
-                editor.removeReouteConnectionSelected();
-                editor.connection_selected = null;
-            }
-            editor.editor_selected = true;
-            break;
-        case 'input':
-            if (editor.ele_selected.classList.length < 2) break;
-            id = editor.ele_selected.parentNode.parentNode.id.slice('node-'.length);
-            currentNode = editor.getNodeFromId(id);
-            type = editor.ele_selected.classList[1];
-            if (currentNode.inputs[type].connections.length > 0) {
-                floodRemove(id, [currentNode.inputs[type].connections[0].node]);
-                break;
-            }
-            let parent;
-            getParents(id).then(parents => {
-                if (type === 'input_1' && parents[0] != null) parent = parents[0];
-                else if (type === 'input_2' && parents[1] != null) parent = parents[1];
-                else return;
-                if (!nodeExists(parent.id)) {
-                    editor.addNodeWithId(parent.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
-                        id: parent.id, name: parent.currentName, description: parent.birthName
-                    }));
-                    let parentNode = editor.getNodeFromId(parent.id);
-                    setPosition(parentNode, currentNode.pos_x, currentNode.pos_y, type);
-                }
-                getChildren(parent.id).then(children => children.forEach((child, index) => {
-                    if (!nodeExists(child.id)) {
-                        editor.addNodeWithId(child.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
-                            id: child.id, name: child.currentName, description: child.birthName
-                        }));
-                        let childNode = editor.getNodeFromId(child.id);
-                        setPosition(childNode, currentNode.pos_x, currentNode.pos_y, '', index * (xDistance + 50));
-                    }
-                    if (nodeExists(child.father)) {
-                        editor.addConnection(child.father, child.id, 'output_1', 'input_1');
-                    }
-                    if (nodeExists(child.mother)) {
-                        editor.addConnection(child.mother, child.id, 'output_1', 'input_2');
-                    }
-                }));
-            });
-            break;
-        case 'output':
-            if (editor.ele_selected.classList.length < 2) break;
-            id = editor.ele_selected.parentNode.parentNode.id.slice('node-'.length);
-            currentNode = editor.getNodeFromId(id);
-            type = editor.ele_selected.classList[1];
-            // TODO: If the current node has children, check if all of them are shown
-            if (currentNode.outputs[type].connections.length > 0) {
-                floodRemove(id, currentNode.outputs[type].connections.map(c => c.node));
-                break;
-            }
-            getChildren(id).then(children => children.forEach((child, index) => {
-                if (!nodeExists(child.id)) {
-                    editor.addNodeWithId(child.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
-                        id: child.id, name: child.currentName, description: child.birthName
-                    }));
-                    let childNode = editor.getNodeFromId(child.id);
-                    setPosition(childNode, currentNode.pos_x, currentNode.pos_y, type, (index - 1) * (xDistance + 50));
-                }
-                if (nodeExists(child.father)) {
-                    editor.addConnection(child.father, child.id, 'output_1', 'input_1');
-                }
-                if (nodeExists(child.mother)) {
-                    editor.addConnection(child.mother, child.id, 'output_1', 'input_2');
-                }
+    let parent;
+    getParents(id).then(parents => {
+        if (type === 'input_1' && parents[0] != null) parent = parents[0];
+        else if (type === 'input_2' && parents[1] != null) parent = parents[1];
+        else return;
+        if (!nodeExists(parent.id)) {
+            this.addNodeWithId(parent.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
+                id: parent.id, name: parent.currentName, description: parent.birthName
             }));
-            break;
-        // case 'point':
-        //     editor.drag_point = true;
-        //     editor.ele_selected.classList.add("selected");
-        //     break;
-        default:
-            break;
+            let parentNode = this.getNodeFromId(parent.id);
+            setPosition(parentNode, currentNode.pos_x, currentNode.pos_y, type);
+        }
+        getChildren(parent.id).then(children => children.forEach((child, index) => {
+            if (!nodeExists(child.id)) {
+                this.addNodeWithId(child.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
+                    id: child.id, name: child.currentName, description: child.birthName
+                }));
+                let childNode = this.getNodeFromId(child.id);
+                setPosition(childNode, currentNode.pos_x, currentNode.pos_y, '', index * (xDistance + 50));
+            }
+            if (nodeExists(child.father)) {
+                this.addConnection(child.father, child.id, 'output_1', 'input_1');
+            }
+            if (nodeExists(child.mother)) {
+                this.addConnection(child.mother, child.id, 'output_1', 'input_2');
+            }
+        }));
+    });
+}
+
+async function onOutputClick(e) {
+    if (this.ele_selected.classList.length < 2) return;
+    const id = this.ele_selected.parentNode.parentNode.id.slice('node-'.length);
+    const currentNode = this.getNodeFromId(id);
+    const type = this.ele_selected.classList[1];
+    // TODO: If the current node has children, check if all of them are shown
+    if (currentNode.outputs[type].connections.length > 0) {
+        floodRemove(id, currentNode.outputs[type].connections.map(c => c.node));
+        return;
     }
-    if (e.type === "touchstart") {
-        editor.pos_x = e.touches[0].clientX;
-        editor.pos_x_start = e.touches[0].clientX;
-        editor.pos_y = e.touches[0].clientY;
-        editor.pos_y_start = e.touches[0].clientY;
-    } else {
-        editor.pos_x = e.clientX;
-        editor.pos_x_start = e.clientX;
-        editor.pos_y = e.clientY;
-        editor.pos_y_start = e.clientY;
-    }
-    editor.dispatch('clickEnd', e);
+    getChildren(id).then(children => children.forEach((child, index) => {
+        if (!nodeExists(child.id)) {
+            this.addNodeWithId(child.id, 'ft', 2, 1, currentNode.pos_x, currentNode.pos_y, [], {}, getFamilyMemberCardHtml({
+                id: child.id, name: child.currentName, description: child.birthName
+            }));
+            let childNode = this.getNodeFromId(child.id);
+            setPosition(childNode, currentNode.pos_x, currentNode.pos_y, type, (index - 1) * (xDistance + 50));
+        }
+        if (nodeExists(child.father)) {
+            this.addConnection(child.father, child.id, 'output_1', 'input_1');
+        }
+        if (nodeExists(child.mother)) {
+            this.addConnection(child.mother, child.id, 'output_1', 'input_2');
+        }
+    }));
 }
 
 function setup() {
@@ -173,15 +86,9 @@ function setup() {
         editor.addNode(name, num_in, num_out, ele_pos_x, ele_pos_y, classoverride, data, html, typenode)
         editor.nodeId = lastId;
     }
-    const oldClick = editor.click;
-    editor.click = (e) => {
-        if (editor.editor_mode !== 'edit') {
-            oldClick(e);
-            return;
-        }
-        onClick(e, editor);
-    }
 
+    editor.clickActions.input = [onInputClick.bind(editor)];
+    editor.clickActions.output = [onOutputClick.bind(editor)];
     editor.start();
 
     const curvature = 64;
