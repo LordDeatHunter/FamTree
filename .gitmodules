@@ -1,3 +1,3 @@
-[submodule "FamTreeFrontend/src/FamtreeDrawflow"]
-	path = FamTreeFrontend/src/FamtreeDrawflow
-	url = https://github.com/LordDeatHunter/FamtreeDrawflow
+[submodule "FamTreeFrontend"]
+	path = FamTreeFrontend
+	url = https://github.com/LordDeatHunter/FamTreeFrontend
