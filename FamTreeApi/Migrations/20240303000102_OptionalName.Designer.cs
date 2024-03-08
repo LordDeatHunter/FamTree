@@ -3,6 +3,7 @@ using System;
 using FamTreeApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FamTreeApi.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240303000102_OptionalName")]
+    partial class OptionalName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

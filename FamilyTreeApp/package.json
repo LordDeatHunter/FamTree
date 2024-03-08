@@ -1,0 +1,35 @@
+{
+  "name": "familytree-app",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "types": "src/types.d.ts",
+  "dependencies": {
+    "nodeflow-lib": "0.0.5",
+    "solid-js": "^1.7.8",
+    "solid-styled-components": "^0.28.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
+    "@typescript-eslint/parser": "^6.6.0",
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "eslint": "8.48.0",
+    "eslint-plugin-jsx-a11y": "6.7.1",
+    "eslint-plugin-solid": "0.13.0",
+    "prettier": "3.0.3",
+    "sass": "^1.66.0",
+    "solid-devtools": "^0.27.3",
+    "typescript": "^5.1.3",
+    "vite": "^4.4.5",
+    "vite-plugin-eslint": "1.8.1",
+    "vite-plugin-solid": "^2.7.0",
+    "vite-plugin-terminal": "^1.1.0"
+  }
+}

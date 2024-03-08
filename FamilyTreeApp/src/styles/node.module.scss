@@ -1,0 +1,123 @@
+@use "colors";
+
+$connector-height: 1rem;
+$connector-border: 6px;
+
+@mixin baseNode {
+  z-index: 1;
+  width: max-content;
+  min-width: 300px;
+  min-height: 100px;
+  padding: 10px;
+  position: absolute;
+  user-select: none;
+  border-radius: 8px;
+  outline: 6px solid colors.$node-border-color;
+  outline-offset: -3px;
+
+  cursor: grab;
+  transition: background-color 0.2s ease-in-out 0s, opacity 0.8s ease-in-out, border-color 0.2s ease-in-out 0s;
+
+  background-color: colors.$node-background-color;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin baseSelectedNode($bg-color) {
+  @include baseNode;
+  background-color: mix(colors.$node-background-color, $bg-color, 40%);
+  cursor: grabbing;
+  z-index: 3;
+}
+
+@mixin connectorSection {
+  position: absolute;
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  height: 0;
+}
+
+@mixin baseConnector($bg-color) {
+  position: relative;
+  height: $connector-height;
+  border-radius: 0.75rem 0.75rem 0 0;
+  cursor: crosshair;
+
+  background-color: $bg-color;
+
+  &:hover {
+    background-color: lighten($bg-color, 10%);
+  }
+
+  outline: $connector-border solid colors.$node-border-color;
+  outline-offset: -3px;
+  border: none;
+}
+
+@mixin outputConnector($bg-color) {
+  @include baseConnector($bg-color);
+
+  width: 25%;
+  bottom: 5px;
+}
+
+.femaleNode {
+  @include baseNode;
+
+  &:hover {
+    background-color: mix(colors.$node-background-color, colors.$female-color, 80%);
+    z-index: 3;
+  }
+}
+
+.maleNode {
+  @include baseNode;
+
+  &:hover {
+    background-color: mix(colors.$node-background-color, colors.$male-color, 80%);
+    z-index: 3;
+  }
+}
+
+.selectedMaleNode {
+  @include baseSelectedNode(colors.$male-color);
+}
+
+.selectedFemaleNode {
+  @include baseSelectedNode(colors.$female-color);
+}
+
+.inputConnector {
+  @include baseConnector(colors.$dark-4);
+
+  width: 100%;
+}
+
+.maleOutputConnector {
+  @include outputConnector(colors.$male-color);
+}
+
+.femaleOutputConnector {
+  @include outputConnector(colors.$female-color);
+}
+
+.inputsSection {
+  @include connectorSection;
+  top: calc(($connector-height + $connector-border) / -2)
+}
+
+.outputsSection {
+  @include connectorSection;
+  bottom: calc(($connector-height + $connector-border) / 2);
+}
+
+.nodeFont {
+  margin: 2rem;
+  font-size: 4rem;
+  font-weight: bold;
+  user-select: none;
+}

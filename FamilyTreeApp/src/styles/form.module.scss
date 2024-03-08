@@ -1,0 +1,215 @@
+@use "colors";
+@use "utils";
+
+@mixin baseDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+
+  > p {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  > p:first-child {
+    height: 1.5rem;
+    font-weight: bold;
+  }
+
+  > p:not(:first-child) {
+    padding: 6px 0;
+    font-size: 1.5rem;
+  }
+}
+
+.formButtonContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-bottom: 32px;
+  gap: 0.75rem;
+}
+
+.displayContainer {
+  @include baseDisplay;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  height: 100%;
+
+  > h2 {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.fieldDisplayContainer {
+  @include baseDisplay;
+}
+
+.femaleFont {
+  color: colors.$female-dark-color;
+}
+
+.maleFont {
+  color: colors.$male-dark-color;
+}
+
+@mixin hovered($base-color, $lighten, $amount) {
+  + svg {
+    filter: drop-shadow(0 0 2px darken(colors.$border-color, $amount));
+    @if $lighten {
+      fill: lighten($base-color, $amount);
+    } @else {
+      fill: darken($base-color, $amount);
+    }
+    height: 1.5rem;
+    width: 1.5rem;
+    margin: 0;
+
+    + label {
+      @if $lighten {
+        color: lighten($base-color, $amount);
+      } @else {
+        color: darken($base-color, $amount);
+      }
+    }
+  }
+}
+
+@mixin radioInput($base-color) {
+  opacity: 0;
+  position: absolute;
+
+  + svg {
+    width: 1rem;
+    height: 1rem;
+    margin: 0.25rem;
+    fill: darken(desaturate($base-color, 75%), 25%);
+    cursor: pointer;
+
+    + label {
+      cursor: pointer;
+      margin: 0;
+      color: darken(desaturate($base-color, 75%), 25%);
+    }
+  }
+
+  &:hover {
+    @include hovered($base-color, true, 10%);
+  }
+
+  &:focus, &:active {
+    @include hovered($base-color, false, 10%);
+  }
+
+  &:checked {
+    @include hovered($base-color, true, 10%);
+
+    + svg {
+      height: 1.25rem;
+      width: 1.25rem;
+      margin: 0.125rem;
+    }
+  }
+
+  &:checked:focus, &:checked:active {
+    @include hovered($base-color, true, 25%);
+  }
+}
+
+.radioInputFemale {
+  @include radioInput(colors.$female-dark-color);
+}
+
+.radioInputMale {
+  @include radioInput(colors.$male-dark-color);
+}
+
+.horizontalRadioInput {
+  display: flex;
+  justify-content: space-between;
+  height: 1.5rem;
+  gap: 0.5rem;
+}
+
+.horizontalRadioContainer {
+  display: flex;
+  justify-content: space-between;
+  height: 10px;
+  padding: 0.5rem 0;
+  gap: 0.5rem;
+}
+
+.parentDisplayContainer {
+  display: flex;
+  width: 100%;
+}
+
+.parentDisplay {
+  @include baseDisplay;
+
+  width: 100%;
+  padding: 0 1.5rem;
+}
+
+@mixin validParent($color) {
+  cursor: pointer;
+  color: $color;
+
+  &:hover {
+    stroke: utils.darkenAndSaturate($color, 10%, $darkness: 30%);
+    filter: drop-shadow(0 0px 4px utils.lightenAndDesaturate($color, 15%, $lightness: 30%));
+  }
+}
+
+.invalidParent {
+  fill: darken(colors.$border-color, 10%);
+}
+
+.validMother {
+  @include validParent(colors.$female-dark-color)
+}
+
+.validFather {
+  @include validParent(colors.$male-dark-color)
+}
+
+.childrenDisplayContainer {
+  @include baseDisplay;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.childrenDisplayWindow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  border: 1px solid colors.$border-color;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  width: 70%;
+  height: 250px;
+  margin: 6px auto 32px auto;
+  overflow: hidden auto;
+}
+
+.child {
+  color: colors.$border-color;
+  cursor: pointer;
+  transition: color 100ms ease-in-out;
+  font-size: 1.5rem;
+  margin: 0;
+
+  &:hover {
+    color: darken(colors.$border-color, 20%);
+  }
+}
