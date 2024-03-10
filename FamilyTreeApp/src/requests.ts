@@ -1,6 +1,7 @@
 import { createFamilyMemberNode } from "./utils";
 import { NodeflowData, NodeflowNodeData, Vec2 } from "nodeflow-lib";
 
+const HOST = import.meta.env.VITE_HOST;
 const GET_ALL_MEMBERS = "/api/familytree/get_all_members";
 const ADD_MEMBER = "/api/familytree/add_member";
 const MODIFY_MEMBER = "/api/familytree/modify_member";
@@ -22,15 +23,17 @@ export interface BackendPerson {
   mother?: string;
 }
 
+export const getRequestURL = (path: string) => `${HOST}${path}`;
+
 export const fetchAllData = async (): Promise<Array<Person>> =>
-  await fetch(GET_ALL_MEMBERS)
+  await fetch(getRequestURL(GET_ALL_MEMBERS))
     .then((response) => response.json())
     .then((data: Array<BackendPerson>) => data.map(mapFromBackendPerson));
 
 export const modifyFamilyMember = async (
   person: Partial<Person>,
 ): Promise<Person | void> =>
-  await fetch(MODIFY_MEMBER, {
+  await fetch(getRequestURL(MODIFY_MEMBER), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -39,7 +42,7 @@ export const modifyFamilyMember = async (
   }).then(mapResponse);
 
 export const setFather = async (childId: string, fatherId: string) =>
-  await fetch(MODIFY_MEMBER, {
+  await fetch(getRequestURL(MODIFY_MEMBER), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -48,7 +51,7 @@ export const setFather = async (childId: string, fatherId: string) =>
   }).then(mapResponse);
 
 export const setMother = async (childId: string, motherId: string) =>
-  await fetch(MODIFY_MEMBER, {
+  await fetch(getRequestURL(MODIFY_MEMBER), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -96,7 +99,7 @@ export const createNewMember = async (
 export const addMember = async (
   person: Omit<BackendPerson, "id">,
 ): Promise<Person | void> =>
-  await fetch(ADD_MEMBER, {
+  await fetch(getRequestURL(ADD_MEMBER), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -105,7 +108,7 @@ export const addMember = async (
   }).then(mapResponse);
 
 export const deleteMember = async (id: string) =>
-  await fetch(`${DELETE_MEMBER}/${id}`, {
+  await fetch(getRequestURL(`${DELETE_MEMBER}/${id}`), {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

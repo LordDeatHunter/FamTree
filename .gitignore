@@ -136,3 +136,6 @@ appsettings*.json
 # IDE specific
 .idea/
 .vscode/
+
+# Docker
+pgdata
