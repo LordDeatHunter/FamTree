@@ -3,14 +3,12 @@ version: '3.9'
 services:
   db:
     image: postgres:16.2
-    user: 1000:1000
     restart: unless-stopped
     shm_size: 128mb
     volumes:
-      - ./pgdata:/var/lib/postgresql/data/pgdata
+      - ./pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgres
-      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - 5123:5432
 
@@ -26,3 +24,5 @@ services:
       - 8081:8080
     depends_on:
       - db
+volumes:
+  pgdata:

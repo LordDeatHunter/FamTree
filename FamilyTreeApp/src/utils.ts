@@ -1,19 +1,18 @@
-import {
-  NodeflowData,
-  NodeflowNodeData,
-  SelectableElementCSS,
-  Vec2,
-} from "nodeflow-lib";
+import { NodeflowNodeData, SelectableElementCSS, Vec2 } from "nodeflow-lib";
 import nodeCss from "./styles/node.module.scss";
 import curveCss from "./styles/curve.module.scss";
 import NodeBody from "./components/NodeBody";
 import {
   createNewMember,
   fetchAllData,
+  fetchChildren,
+  fetchParents,
+  fetchPerson,
   Person,
   setFather,
   setMother,
 } from "./requests";
+import { nodeflowData } from "./App";
 
 const getConnectionCSS = (
   parentGender: CustomNodeflowDataType["gender"],
@@ -26,7 +25,6 @@ const getConnectionCSS = (
 });
 
 export const createParentConnections = (
-  nodeflowData: NodeflowData,
   child?: NodeflowNodeData,
   parent?: NodeflowNodeData,
 ) => {
@@ -58,7 +56,6 @@ export const createParentConnections = (
 };
 
 export const createFamilyMemberNode = (
-  nodeflowData: NodeflowData,
   id: string,
   name: string,
   gender: CustomNodeflowDataType["gender"],
@@ -116,20 +113,17 @@ export const createFamilyMemberNode = (
 
   if (fatherId) {
     const father = nodeflowData.nodes.get(fatherId);
-    createParentConnections(nodeflowData, newNode, father);
+    createParentConnections(newNode, father);
   }
   if (motherId) {
     const mother = nodeflowData.nodes.get(motherId);
-    createParentConnections(nodeflowData, newNode, mother);
+    createParentConnections(newNode, mother);
   }
 
   return newNode;
 };
 
-export const updateFamilyMemberNode = (
-  nodeflowData: NodeflowData,
-  person: Person,
-) => {
+export const updateFamilyMemberNode = (person: Person) => {
   const node = nodeflowData.nodes.get(person.id);
   if (!node) return;
 
@@ -140,19 +134,18 @@ export const updateFamilyMemberNode = (
 
   if (person.fatherId) {
     const father = nodeflowData.nodes.get(person.fatherId);
-    createParentConnections(nodeflowData, node, father);
+    createParentConnections(node, father);
   }
   if (person.motherId) {
     const mother = nodeflowData.nodes.get(person.motherId);
-    createParentConnections(nodeflowData, node, mother);
+    createParentConnections(node, mother);
   }
 };
-export const setupInitialNodes = async (nodeflowData: NodeflowData) => {
+export const setupInitialNodes = async () => {
   const data = await fetchAllData();
 
   for (const person of data) {
     createFamilyMemberNode(
-      nodeflowData,
       person.id,
       person.name,
       person.gender,
@@ -163,17 +156,122 @@ export const setupInitialNodes = async (nodeflowData: NodeflowData) => {
     if (person.fatherId) {
       const father = nodeflowData.nodes.get(person.fatherId);
       const child = nodeflowData.nodes.get(person.id);
-      createParentConnections(nodeflowData, child, father);
+      createParentConnections(child, father);
     }
     if (person.motherId) {
       const mother = nodeflowData.nodes.get(person.motherId);
       const child = nodeflowData.nodes.get(person.id);
-      createParentConnections(nodeflowData, child, mother);
+      createParentConnections(child, mother);
     }
   }
 };
 
-export const setupEvents = (nodeflowData: NodeflowData) => {
+export const setupInitialNode = async (nodeId: string) => {
+  const person = await fetchPerson(nodeId);
+  createFamilyMemberNode(person.id, person.name, person.gender);
+};
+
+export const setupParents = async (nodeId: string) => {
+  const node = nodeflowData.nodes.get(nodeId);
+  if (!node) return;
+  if (node.getAllSourceConnectors().length >= 2) return;
+  const [father, mother] = await fetchParents(nodeId);
+
+  const halfSize = node.size.divideBy(2);
+
+  if (father && !nodeflowData.nodes.get(father.id)) {
+    createFamilyMemberNode(
+      father.id,
+      father.name,
+      father.gender,
+      node.position.add(Vec2.of(halfSize.x * 4, -node.size.y - 350)),
+    );
+    createParentConnections(
+      nodeflowData.nodes.get(nodeId),
+      nodeflowData.nodes.get(father.id),
+    );
+  }
+  if (mother && !nodeflowData.nodes.get(mother.id)) {
+    createFamilyMemberNode(
+      mother.id,
+      mother.name,
+      mother.gender,
+      node.position.add(Vec2.of(halfSize.x * -2, -node.size.y - 350)),
+    );
+    createParentConnections(
+      nodeflowData.nodes.get(nodeId),
+      nodeflowData.nodes.get(mother.id),
+    );
+  }
+};
+
+export const setupChildren = async (nodeId: string) => {
+  const node = nodeflowData.nodes.get(nodeId);
+  if (!node) return;
+  if (node.getAllSourceConnectors().length >= 2) return;
+  const children = await fetchChildren(nodeId);
+
+  const halfSize = node.size.divideBy(2);
+
+  let i = -(children.length - 1) / 2;
+  for (const child of children) {
+    if (nodeflowData.nodes.get(child.id)) {
+      updateFamilyMemberNode(child);
+      continue;
+    }
+    createFamilyMemberNode(
+      child.id,
+      child.name,
+      child.gender,
+      node.position.add(Vec2.of(halfSize.x * (3 * i + 1), node.size.y + 350)),
+    );
+    createParentConnections(
+      nodeflowData.nodes.get(child.id),
+      nodeflowData.nodes.get(nodeId),
+    );
+    i++;
+  }
+};
+
+export const collapseChildrenNodeStructure = (nodeId: string) => {
+  const node = nodeflowData.nodes.get(nodeId);
+  if (!node) return;
+
+  const keys = nodeflowData.nodes;
+  keys.forEach((node) => {
+    if (node.id !== nodeId) {
+      nodeflowData.removeNode(node.id);
+    }
+  });
+  // node
+  //   .getAllDestinationConnectors()
+  //   .map((connector) => connector.parentNode.id)
+  //   .forEach((childId) => {
+  //     collapseChildrenNodeStructure(childId);
+  //     nodeflowData.removeNode(childId);
+  //   });
+};
+
+export const collapseParentNodeStructure = (nodeId: string) => {
+  const node = nodeflowData.nodes.get(nodeId);
+  if (!node) return;
+
+  const keys = nodeflowData.nodes;
+  keys.forEach((node) => {
+    if (node.id !== nodeId) {
+      nodeflowData.removeNode(node.id);
+    }
+  });
+  // node
+  //   .getAllSourceConnectors()
+  //   .map((connector) => connector.parentNode.id)
+  //   .forEach((parentId) => {
+  //     collapseParentNodeStructure(parentId);
+  //     nodeflowData.removeNode(parentId);
+  //   });
+};
+
+export const setupEvents = () => {
   nodeflowData.eventStore.onPointerUpInConnector.blacklist(
     "familytree-app:prevent-connections-to-parent-connectors",
     ({ connectorId }, name) =>
@@ -198,7 +296,7 @@ export const setupEvents = (nodeflowData: NodeflowData) => {
 
       const position = nodeflowData.mouseData.globalMousePosition();
 
-      createNewMember(nodeflowData, undefined, heldNode, position);
+      createNewMember(undefined, heldNode, position);
     },
     1,
   );
@@ -214,11 +312,11 @@ export const setupEvents = (nodeflowData: NodeflowData) => {
 
       if (outputNode.customData.gender == "M") {
         setFather(inputNode.id, outputNode.id).then((person) =>
-          updateFamilyMemberNode(nodeflowData, person),
+          updateFamilyMemberNode(person),
         );
       } else {
         setMother(inputNode.id, outputNode.id).then((person) =>
-          updateFamilyMemberNode(nodeflowData, person),
+          updateFamilyMemberNode(person),
         );
       }
     },
@@ -253,11 +351,11 @@ export const setupEvents = (nodeflowData: NodeflowData) => {
 
       if (sourceNode.customData.gender == "M") {
         setFather(destinationNode.id, sourceNode.id).then((person) =>
-          updateFamilyMemberNode(nodeflowData, person),
+          updateFamilyMemberNode(person),
         );
       } else {
         setMother(destinationNode.id, sourceNode.id).then((person) =>
-          updateFamilyMemberNode(nodeflowData, person),
+          updateFamilyMemberNode(person),
         );
       }
     },

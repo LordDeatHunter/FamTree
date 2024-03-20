@@ -1,11 +1,14 @@
 import { createFamilyMemberNode } from "./utils";
-import { NodeflowData, NodeflowNodeData, Vec2 } from "nodeflow-lib";
+import { NodeflowNodeData, Vec2 } from "nodeflow-lib";
 
 const HOST = import.meta.env.VITE_HOST;
 const GET_ALL_MEMBERS = "/api/familytree/get_all_members";
+const GET_MEMBER = "/api/familytree/get_member";
 const ADD_MEMBER = "/api/familytree/add_member";
 const MODIFY_MEMBER = "/api/familytree/modify_member";
 const DELETE_MEMBER = "/api/familytree/delete_member";
+const GET_PARENTS = "/api/familytree/get_parents";
+const GET_CHILDREN = "/api/familytree/get_children";
 
 export interface Person {
   gender: CustomNodeflowDataType["gender"];
@@ -27,6 +30,24 @@ export const getRequestURL = (path: string) => `${HOST}${path}`;
 
 export const fetchAllData = async (): Promise<Array<Person>> =>
   await fetch(getRequestURL(GET_ALL_MEMBERS))
+    .then((response) => response.json())
+    .then((data: Array<BackendPerson>) => data.map(mapFromBackendPerson));
+
+export const fetchPerson = async (id: string): Promise<Person> =>
+  await fetch(getRequestURL(`${GET_MEMBER}/${id}`)).then(mapResponse);
+
+export const fetchParents = async (
+  id: string,
+): Promise<[Person | null, Person | null]> =>
+  await fetch(getRequestURL(`${GET_PARENTS}/${id}`))
+    .then((response) => response.json())
+    .then((data: [BackendPerson | null, BackendPerson | null]) =>
+      data.map((person) => (person ? mapFromBackendPerson(person) : person)),
+    )
+    .then(([father, mother]) => [father, mother]);
+
+export const fetchChildren = async (id: string): Promise<Array<Person>> =>
+  await fetch(getRequestURL(`${GET_CHILDREN}/${id}`))
     .then((response) => response.json())
     .then((data: Array<BackendPerson>) => data.map(mapFromBackendPerson));
 
@@ -60,7 +81,6 @@ export const setMother = async (childId: string, motherId: string) =>
   }).then(mapResponse);
 
 export const createNewMember = async (
-  nodeflowData: NodeflowData,
   nodeData?: Partial<CustomNodeflowDataType>,
   parent?: NodeflowNodeData,
   position = Vec2.zero(),
@@ -71,8 +91,6 @@ export const createNewMember = async (
     currentName: nodeData?.name ?? "Unknown",
     gender: gender === "M" ? "Male" : "Female",
   };
-
-  console.log(person);
 
   if (parent) {
     if (parent.customData.gender === "M") {
@@ -85,7 +103,6 @@ export const createNewMember = async (
   return addMember(person).then((data) => {
     if (!data) return;
     return createFamilyMemberNode(
-      nodeflowData,
       data.id,
       data.name,
       data.gender,
@@ -137,13 +154,24 @@ export const mapToPartialBackendPerson = (
   const partial = {
     currentName: person.name,
     id: person.id,
-    gender: person.gender === "F" ? "Female" : "Male",
+    gender: mapGenderToBackend(person.gender),
     father: person.fatherId,
     mother: person.motherId,
   };
   return Object.fromEntries(
     Object.entries(partial).filter(([_, value]) => value !== undefined),
   ) as Partial<BackendPerson>;
+};
+
+export const mapGenderToBackend = (gender?: "M" | "F") => {
+  switch (gender) {
+    case "M":
+      return "Male";
+    case "F":
+      return "Female";
+    default:
+      return undefined;
+  }
 };
 
 export const mapFromBackendPerson = (person: BackendPerson): Person => ({

@@ -132,6 +132,7 @@ $RECYCLE.BIN/
 _NCrunch*
 
 appsettings*.json
+!appsettings.example.json
 
 # IDE specific
 .idea/

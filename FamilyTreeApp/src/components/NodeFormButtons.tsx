@@ -1,9 +1,8 @@
 import { Component, Show } from "solid-js";
-import { NodeflowLib, NodeflowNodeData, Optional } from "nodeflow-lib";
+import { NodeflowNodeData, Optional } from "nodeflow-lib";
 import { FormDataType } from "./SidebarContent";
 import formStyle from "../styles/form.module.scss";
 import { cleanInput, updateFamilyMemberNode } from "../utils";
-import { FamilyTreeConstants } from "../Constants";
 import nodeCss from "../styles/node.module.scss";
 import {
   createNewMember,
@@ -11,6 +10,7 @@ import {
   modifyFamilyMember,
   Person,
 } from "../requests";
+import { nodeflowData } from "../App";
 
 interface NodeFormButtonsProps {
   mode: "add" | "empty" | "view" | "edit";
@@ -24,10 +24,6 @@ const AddButton: Component<{ onClick: () => void }> = (props) => (
 );
 
 const NodeFormButtons: Component<NodeFormButtonsProps> = (props) => {
-  const nodeflowData = NodeflowLib.get().getNodeflow(
-    FamilyTreeConstants.MAIN_NODEFLOW,
-  )!;
-
   const onAdd = () => props.setFormData({ name: "" } as FormDataType);
   const onCancel = () => props.setFormData(undefined);
   const onEdit = () => props.setFormData({ ...props.nodeData! });
@@ -66,14 +62,13 @@ const NodeFormButtons: Component<NodeFormButtonsProps> = (props) => {
     // TODO: update child connections
     // nodeflowData.removeOutgoingConnections(data.id);
 
-    updateFamilyMemberNode(nodeflowData, data);
+    updateFamilyMemberNode(data);
     props.setFormData(undefined);
   };
 
   const onSaveNewNode = () => {
     if (!props.formData?.name || !props.formData?.gender) return;
     createNewMember(
-      nodeflowData,
       {
         name: cleanInput(props.formData!.name),
         gender: props.formData!.gender,

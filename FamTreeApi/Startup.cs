@@ -44,6 +44,15 @@ public class Startup
 
         app.UseAuthorization();
 
+        // Apply database migrations on startup
+        using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            var context = serviceScope.ServiceProvider.GetService<FamilyTreeDbContext>();
+            context?.Database.Migrate();
+        }
+
+        app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }

@@ -1,0 +1,8 @@
+@use "colors";
+
+.sideButtonContainer {
+  height: 100%;
+  position: absolute;
+  transition: all 0.3s ease-in-out;
+  right: 0;
+}

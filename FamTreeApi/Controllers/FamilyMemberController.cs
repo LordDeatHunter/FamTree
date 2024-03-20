@@ -24,25 +24,25 @@ public class FamilyMemberController(FamilyTreeDbContext context) : ControllerBas
     }
 
     [HttpGet]
-    [Route("get_member")]
-    public IActionResult GetFamilyMember(Guid uuid)
+    [Route("get_member/{id}")]
+    public IActionResult GetFamilyMember(string id)
     {
         var member = context.FamilyTree
             .Include(m => m.Father)
             .Include(m => m.Mother)
-            .FirstOrDefault(m => m.Id == uuid);
+            .FirstOrDefault(m => m.Id.ToString() == id);
 
         return member == null ? NotFound(new { message = "Member not found" }) : Ok(member);
     }
 
     [HttpGet]
-    [Route("get_parents")]
-    public IActionResult GetParents(Guid uuid)
+    [Route("get_parents/{id}")]
+    public IActionResult GetParents(string id)
     {
         var person = context.FamilyTree
             .Include(m => m.Father)
             .Include(m => m.Mother)
-            .FirstOrDefault(m => m.Id == uuid);
+            .FirstOrDefault(m => m.Id.ToString() == id);
         if (person == null) return NotFound(new { message = "Member not found" });
         var parents = new List<FamilyMember?>();
         var father = context.FamilyTree
@@ -55,12 +55,12 @@ public class FamilyMemberController(FamilyTreeDbContext context) : ControllerBas
     }
 
     [HttpGet]
-    [Route("get_father")]
-    public IActionResult GetFather(Guid uuid)
+    [Route("get_father/{id}")]
+    public IActionResult GetFather(string id)
     {
         var person = context.FamilyTree
             .Include(m => m.Father)
-            .FirstOrDefault(m => m.Id == uuid);
+            .FirstOrDefault(m => m.Id.ToString() == id);
         if (person == null) return NotFound(new { message = "Member not found" });
         return Ok(context.FamilyTree
             .FirstOrDefault(m => m.Gender == Male && person.Father != null && person.Father.Id == m.Id)
@@ -68,12 +68,12 @@ public class FamilyMemberController(FamilyTreeDbContext context) : ControllerBas
     }
 
     [HttpGet]
-    [Route("get_mother")]
-    public IActionResult GetMother(Guid uuid)
+    [Route("get_mother/{id}")]
+    public IActionResult GetMother(string id)
     {
         var person = context.FamilyTree
             .Include(m => m.Mother)
-            .FirstOrDefault(m => m.Id == uuid);
+            .FirstOrDefault(m => m.Id.ToString() == id);
         if (person == null) return NotFound(new { message = "Member not found" });
         return Ok(context.FamilyTree.FirstOrDefault(
             m => m.Gender == Female && person.Mother != null && person.Mother.Id == m.Id)
@@ -81,10 +81,10 @@ public class FamilyMemberController(FamilyTreeDbContext context) : ControllerBas
     }
 
     [HttpGet]
-    [Route("get_children")]
-    public IActionResult GetChildren(Guid uuid)
+    [Route("get_children/{id}")]
+    public IActionResult GetChildren(string id)
     {
-        var person = context.FamilyTree.FirstOrDefault(m => m.Id == uuid);
+        var person = context.FamilyTree.FirstOrDefault(m => m.Id.ToString() == id);
         return person == null
             ? NotFound(new { message = "Member not found" })
             : Ok(context.FamilyTree.Where(m =>
