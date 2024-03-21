@@ -174,7 +174,6 @@ export const setupInitialNode = async (nodeId: string) => {
 export const setupParents = async (nodeId: string) => {
   const node = nodeflowData.nodes.get(nodeId);
   if (!node) return;
-  if (node.getAllSourceConnectors().length >= 2) return;
   const [father, mother] = await fetchParents(nodeId);
 
   const halfSize = node.size.divideBy(2);
@@ -208,7 +207,6 @@ export const setupParents = async (nodeId: string) => {
 export const setupChildren = async (nodeId: string) => {
   const node = nodeflowData.nodes.get(nodeId);
   if (!node) return;
-  if (node.getAllSourceConnectors().length >= 2) return;
   const children = await fetchChildren(nodeId);
 
   const halfSize = node.size.divideBy(2);

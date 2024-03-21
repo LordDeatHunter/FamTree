@@ -1,8 +1,12 @@
 import Button1 from "../../assets/tree-structure.svg";
-import { Component, createMemo } from "solid-js";
+import { Component, createEffect } from "solid-js";
 import css from "../styles/sidebuttons.module.scss";
-import { NodeflowNodeData, Optional } from "nodeflow-lib";
-import {collapseChildrenNodeStructure, collapseParentNodeStructure, setupChildren, setupParents} from "../utils";
+import {
+  collapseChildrenNodeStructure,
+  collapseParentNodeStructure,
+  setupChildren,
+  setupParents,
+} from "../utils";
 import { nodeflowData } from "../App";
 
 const SideButtons: Component = () => {
@@ -18,7 +22,7 @@ const SideButtons: Component = () => {
         alt="Button 1"
         width="48"
         height="48"
-        style={{ rotate: "90deg", cursor: "pointer"}}
+        style={{ rotate: "90deg", cursor: "pointer", "user-select": "none" }}
         onClick={() => {
           setupParents(node()!.id);
           setupChildren(node()!.id);
@@ -30,7 +34,7 @@ const SideButtons: Component = () => {
         alt="Button 1"
         width="48"
         height="48"
-        style={{ rotate: "-90deg", cursor: "pointer"}}
+        style={{ rotate: "-90deg", cursor: "pointer", "user-select": "none" }}
         onClick={() => {
           collapseParentNodeStructure(node()!.id);
           collapseChildrenNodeStructure(node()!.id);
