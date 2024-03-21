@@ -1,5 +1,5 @@
 import Button1 from "../../assets/tree-structure.svg";
-import { Component, createEffect } from "solid-js";
+import { Component, createMemo } from "solid-js";
 import css from "../styles/sidebuttons.module.scss";
 import {
   collapseChildrenNodeStructure,
@@ -8,6 +8,7 @@ import {
   setupParents,
 } from "../utils";
 import { nodeflowData } from "../App";
+import { NodeflowNodeData, Optional } from "nodeflow-lib";
 
 const SideButtons: Component = () => {
   const node = createMemo<Optional<NodeflowNodeData>>(
