@@ -1,3 +1,4 @@
+using System;
 using FamTreeApi.Models;
 using FamTreeApi.Utils;
 using Microsoft.AspNetCore.Builder;
@@ -23,8 +24,15 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddDbContext<FamilyTreeDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+        var connectionString = Configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "Connection string 'DefaultConnection' is not configured. Set it in appsettings.json " +
+                "or provide the ConnectionStrings__DefaultConnection environment variable.");
+        }
+
+        services.AddDbContext<FamilyTreeDbContext>(options => options.UseNpgsql(connectionString));
 
         services.AddControllers();
         services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "FamTreeApi", Version = "v1" }));

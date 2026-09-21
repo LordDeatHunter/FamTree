@@ -8,9 +8,16 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     environment:
+      POSTGRES_DB: famtree
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - 5123:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d famtree"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   adminer:
     image: adminer
@@ -22,7 +29,10 @@ services:
     build: ./FamTreeApi
     ports:
       - 8081:8080
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db;Database=famtree;Username=postgres;Password=postgres;Pooling=true"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 volumes:
   pgdata:
