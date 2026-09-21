@@ -2,6 +2,12 @@ import { createFamilyMemberNode } from "./utils";
 import { NodeflowNodeData, Vec2 } from "nodeflow-lib";
 
 const HOST = import.meta.env.VITE_HOST;
+
+if (!HOST) {
+  throw new Error(
+    "VITE_HOST is not set. Copy FamilyTreeApp/.env.example to FamilyTreeApp/.env and set the API base URL.",
+  );
+}
 const GET_ALL_MEMBERS = "/api/familytree/get_all_members";
 const GET_MEMBER = "/api/familytree/get_member";
 const ADD_MEMBER = "/api/familytree/add_member";
