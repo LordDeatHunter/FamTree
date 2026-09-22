@@ -1,0 +1,369 @@
+@import "tailwindcss";
+
+/* Values compiled 1:1 from the previous SCSS colour math (styles/colors.scss,
+   styles/utils.scss) so rendered colours match the pre-Tailwind build exactly. */
+@theme {
+  --color-dark-1: #faf9f5;
+  --color-dark-2: #ecebe7;
+  --color-dark-3: #cbc6c1;
+  --color-dark-4: #a69e9a;
+  --color-dark-5: #807b7a;
+  --color-dark-6: #595757;
+  --color-dark-7: #323232;
+  --color-dark-8: #1c1c1c;
+  --color-dark-9: #0d0d0d;
+
+  --color-background: #ecebe7;
+  --color-element-background: #cbc6c1;
+  --color-border: #595757;
+  --color-node-background: #cbc6c1;
+  --color-node-border: #595757;
+  --color-node-text: #1c1c1c;
+  --color-font: #323232;
+  --color-input-connector: #a69e9a;
+
+  --color-female: #ff84c3;
+  --color-male: #84c3ff;
+  --color-female-dark: #ea0078;
+  --color-male-dark: #0078ea;
+
+  --color-btn-hover-bg: #ffffff;
+  --color-btn-hover-border: #323131;
+  --color-btn-hover-font: #4c4c4c;
+  --color-btn-focus-bg: #e1dfd9;
+  --color-btn-focus-border: #3f3e3e;
+  --color-btn-focus-font: #252525;
+  --color-btn-active-bg: #d5d3cb;
+  --color-btn-active-border: #252525;
+  --color-btn-active-font: #191919;
+
+  --color-node-female-hover: #d5b9c1;
+  --color-node-male-hover: #bdc5cd;
+  --color-node-female-selected: #ea9ec2;
+  --color-node-male-selected: #a0c4e6;
+
+  --color-connector-input-hover: #beb8b5;
+  --color-connector-male-hover: #b7dcff;
+  --color-connector-female-hover: #ffb7dc;
+
+  --color-curve-male: #84c3ff;
+  --color-curve-female: #ff84c3;
+  --color-curve-male-selected: #389eff;
+  --color-curve-female-selected: #ff389e;
+  --color-curve-male-new: #d6e8f9;
+  --color-curve-female-new: #f9d6e8;
+
+  --color-radio-male-base: #283643;
+  --color-radio-female-base: #432836;
+  --color-radio-male-hover: #1e91ff;
+  --color-radio-female-hover: #ff1e91;
+  --color-radio-male-focus: #005eb7;
+  --color-radio-female-focus: #b7005e;
+  --color-radio-male-checked-focus: #6bb7ff;
+  --color-radio-female-checked-focus: #ff6bb7;
+
+  --color-valid-mother-hover: #51002a;
+  --color-valid-father-hover: #002a51;
+  --color-valid-mother-shadow: #f68dc3;
+  --color-valid-father-shadow: #8dc3f6;
+  --color-invalid-parent: #3f3e3e;
+  --color-child-hover: #252525;
+
+  --font-mono: "Roboto Mono", monospace;
+}
+
+@layer base {
+  /* Preflight switches every element to `border-box`, but the original SCSS was
+     authored against the browser default of `content-box`. Restoring it keeps
+     input heights, button min-widths and node sizes identical. */
+  *,
+  ::before,
+  ::after {
+    box-sizing: content-box;
+  }
+
+  /* Preflight clamps images to `max-width: 100%`, which collapses the sidebar
+     toggle to 0px while the sidebar is closed (its container is `width: 0`). */
+  img,
+  video {
+    max-width: none;
+  }
+
+  /*
+   * Tailwind's Preflight removes the user-agent heading defaults that this app
+   * previously relied on. Restore them so the UI renders unchanged.
+   */
+  h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.67em 0;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.83em 0;
+  }
+
+  body {
+    min-width: 100vw;
+    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-mono);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Preflight sets `line-height: 1.5`; this app was laid out against the
+       user-agent default, so keep `normal` to avoid shifting the sidebar. */
+    line-height: normal;
+    overflow: auto;
+    position: fixed;
+    background-color: var(--color-background);
+    color: var(--color-font);
+  }
+
+  #root {
+    width: 100%;
+    height: 100%;
+  }
+
+  button {
+    font-size: 100%;
+    font-family: inherit;
+    line-height: 1.15;
+    margin: 0;
+    overflow: visible;
+    text-transform: none;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    min-width: 6rem;
+    border-radius: 0.25rem;
+    border-width: 2px;
+    border-color: var(--color-border);
+    border-style: solid;
+    background-color: var(--color-background);
+    outline: none;
+
+    &:hover {
+      background-color: var(--color-btn-hover-bg);
+      border-color: var(--color-btn-hover-border);
+      color: var(--color-btn-hover-font);
+    }
+
+    &:focus {
+      background-color: var(--color-btn-focus-bg);
+      border-color: var(--color-btn-focus-border);
+      color: var(--color-btn-focus-font);
+      filter: drop-shadow(0 0 2px var(--color-btn-focus-border));
+    }
+
+    &:active {
+      background-color: var(--color-btn-active-bg);
+      border-color: var(--color-btn-active-border);
+      color: var(--color-btn-active-font);
+    }
+  }
+
+  input[type="radio"] {
+    appearance: none;
+    outline: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 100%;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-background);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 0.25rem;
+
+    &:checked {
+      background-color: var(--color-dark-5);
+      width: 0.75rem;
+      height: 0.75rem;
+      margin: 0.375rem;
+    }
+
+    &:hover,
+    &:focus {
+      filter: drop-shadow(0 0 2px var(--color-btn-focus-border));
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: var(--color-element-background);
+      border-color: var(--color-border);
+    }
+  }
+
+  input[type="text"] {
+    border-radius: 0.25rem;
+    border-width: 2px;
+    border-color: var(--color-border);
+    border-style: solid;
+    background-color: var(--color-background);
+    padding: 0.5rem 1rem;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+    height: 1.5rem;
+    font-size: 1rem;
+
+    &:hover,
+    &:focus {
+      background-color: var(--color-btn-focus-bg);
+      border-color: var(--color-btn-focus-border);
+      color: var(--color-btn-focus-font);
+      filter: drop-shadow(0 0 2px var(--color-btn-focus-border));
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: var(--color-element-background);
+      border-color: var(--color-border);
+    }
+  }
+}
+
+@layer components {
+  /*
+   * Shared field layout, ported from the SCSS `baseDisplay` mixin. Kept as a
+   * component class because it relies on `> p`, `:first-child` and `:not()`
+   * child selectors that would need eight repeated arbitrary variants.
+   */
+  .display-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+
+    > p {
+      margin: 0;
+      width: 100%;
+      text-align: center;
+    }
+
+    > p:first-child {
+      height: 1.5rem;
+      font-weight: bold;
+    }
+
+    > p:not(:first-child) {
+      padding: 6px 0;
+      font-size: 1.5rem;
+    }
+  }
+
+  /*
+   * Gender radio, ported from the SCSS `radioInput`/`hovered` mixins. The hidden
+   * input drives its adjacent icon and label. The gender custom properties live on
+   * the row wrapper because custom properties do not inherit across siblings.
+   */
+  .radio-group-male {
+    --radio-base: var(--color-radio-male-base);
+    --radio-hover: var(--color-radio-male-hover);
+    --radio-focus: var(--color-radio-male-focus);
+    --radio-checked-focus: var(--color-radio-male-checked-focus);
+  }
+
+  .radio-group-female {
+    --radio-base: var(--color-radio-female-base);
+    --radio-hover: var(--color-radio-female-hover);
+    --radio-focus: var(--color-radio-female-focus);
+    --radio-checked-focus: var(--color-radio-female-checked-focus);
+  }
+
+  .radio-group-male,
+  .radio-group-female {
+    > input {
+      opacity: 0;
+      position: absolute;
+    }
+
+    > input + svg {
+      width: 1rem;
+      height: 1rem;
+      margin: 0.25rem;
+      fill: var(--radio-base);
+      cursor: pointer;
+
+      & + label {
+        cursor: pointer;
+        margin: 0;
+        color: var(--radio-base);
+      }
+    }
+
+    > input:hover + svg {
+      filter: drop-shadow(0 0 2px var(--color-btn-focus-border));
+      fill: var(--radio-hover);
+      height: 1.5rem;
+      width: 1.5rem;
+      margin: 0;
+
+      & + label {
+        color: var(--radio-hover);
+      }
+    }
+
+    > input:focus + svg,
+    > input:active + svg {
+      filter: drop-shadow(0 0 2px var(--color-btn-focus-border));
+      fill: var(--radio-focus);
+      height: 1.5rem;
+      width: 1.5rem;
+      margin: 0;
+
+      & + label {
+        color: var(--radio-focus);
+      }
+    }
+
+    > input:checked + svg {
+      filter: drop-shadow(0 0 2px var(--color-btn-focus-border));
+      fill: var(--radio-hover);
+      height: 1.25rem;
+      width: 1.25rem;
+      margin: 0.125rem;
+
+      & + label {
+        color: var(--radio-hover);
+      }
+    }
+
+    > input:checked:focus + svg,
+    > input:checked:active + svg {
+      filter: drop-shadow(0 0 2px var(--color-btn-focus-border));
+      fill: var(--radio-checked-focus);
+      height: 1.5rem;
+      width: 1.5rem;
+      margin: 0;
+
+      & + label {
+        color: var(--radio-checked-focus);
+      }
+    }
+  }
+
+  /* Clickable parent links in the node display, ported from `validParent`. */
+  .valid-mother {
+    cursor: pointer;
+    color: var(--color-female-dark);
+
+    &:hover {
+      stroke: var(--color-valid-mother-hover);
+      filter: drop-shadow(0 0 4px var(--color-valid-mother-shadow));
+    }
+  }
+
+  .valid-father {
+    cursor: pointer;
+    color: var(--color-male-dark);
+
+    &:hover {
+      stroke: var(--color-valid-father-hover);
+      filter: drop-shadow(0 0 4px var(--color-valid-father-shadow));
+    }
+  }
+}

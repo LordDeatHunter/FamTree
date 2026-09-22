@@ -16,6 +16,7 @@
     "solid-styled-components": "^0.28.5"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
     "@types/node": "^20.11.30",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
@@ -24,8 +25,8 @@
     "eslint-plugin-jsx-a11y": "6.7.1",
     "eslint-plugin-solid": "0.13.0",
     "prettier": "3.0.3",
-    "sass": "^1.72.0",
     "solid-devtools": "^0.29.3",
+    "tailwindcss": "4.3.3",
     "typescript": "^5.4.3",
     "vite": "5.2.2",
     "vite-plugin-eslint": "1.8.1",

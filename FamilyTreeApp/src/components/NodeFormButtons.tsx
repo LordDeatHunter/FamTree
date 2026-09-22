@@ -1,9 +1,15 @@
 import { Component, Show } from "solid-js";
 import { NodeflowNodeData, Optional } from "nodeflow-lib";
 import { FormDataType } from "./SidebarContent";
-import formStyle from "../styles/form.module.scss";
 import { cleanInput, updateFamilyMemberNode } from "../utils";
-import nodeCss from "../styles/node.module.scss";
+import {
+  femaleNode,
+  femaleOutputConnector,
+  maleNode,
+  maleOutputConnector,
+  selectedFemaleNode,
+  selectedMaleNode,
+} from "../styles/nodeClasses";
 import {
   createNewMember,
   deleteMember,
@@ -46,17 +52,12 @@ const NodeFormButtons: Component<NodeFormButtonsProps> = (props) => {
 
     if (node.customData.gender !== data.gender) {
       node.css = {
-        normal: data.gender === "M" ? nodeCss.maleNode : nodeCss.femaleNode,
-        selected:
-          data.gender === "M"
-            ? nodeCss.selectedMaleNode
-            : nodeCss.selectedFemaleNode,
+        normal: data.gender === "M" ? maleNode : femaleNode,
+        selected: data.gender === "M" ? selectedMaleNode : selectedFemaleNode,
       };
 
       node.getConnector("O")!.css =
-        data.gender === "M"
-          ? nodeCss.maleOutputConnector
-          : nodeCss.femaleOutputConnector;
+        data.gender === "M" ? maleOutputConnector : femaleOutputConnector;
     }
 
     // TODO: update child connections
@@ -119,7 +120,7 @@ const NodeFormButtons: Component<NodeFormButtonsProps> = (props) => {
   };
 
   return (
-    <div class={formStyle.formButtonContainer}>
+    <div class="flex justify-between mt-auto pb-8 gap-3">
       <Show when={props.mode === "empty"}>
         <AddButton onClick={onAdd} />
       </Show>

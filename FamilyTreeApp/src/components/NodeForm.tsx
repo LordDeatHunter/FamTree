@@ -1,18 +1,20 @@
 import { Component, Show } from "solid-js";
 import { FormDataType } from "./SidebarContent";
-import formStyle from "../styles/form.module.scss";
 import Male from "../icons/Male";
 import Female from "../icons/Female";
+
+const displayContainer =
+  "flex flex-col gap-6 items-center mb-4 w-full h-full [&>h2]:w-full [&>h2]:text-center";
 
 const NodeForm: Component<{
   formData: FormDataType;
   updateFormData: (data: Partial<FormDataType>) => void;
 }> = (props) => (
-  <div class={formStyle.displayContainer}>
+  <div class={displayContainer}>
     <Show when={props.formData.id} fallback={<h2>Create Node</h2>}>
       <h2>Update Node</h2>
     </Show>
-    <div class={formStyle.fieldDisplayContainer}>
+    <div class="display-field">
       <p>Name</p>
       <input
         type="text"
@@ -22,10 +24,10 @@ const NodeForm: Component<{
         onInput={(e) => props.updateFormData({ name: e.target.value })}
       />
     </div>
-    <div class={formStyle.fieldDisplayContainer}>
+    <div class="display-field">
       <p>Gender</p>
-      <div class={formStyle.horizontalRadioContainer}>
-        <div class={formStyle.horizontalRadioInput}>
+      <div class="flex justify-between h-[10px] py-2 gap-2">
+        <div class="flex justify-between h-6 gap-2 radio-group-male">
           <input
             type="radio"
             id="male"
@@ -33,12 +35,11 @@ const NodeForm: Component<{
             value="M"
             checked={props.formData.gender === "M"}
             onChange={() => props.updateFormData({ gender: "M" })}
-            class={formStyle.radioInputMale}
           />
           <Male />
           <label for="male">Male</label>
         </div>
-        <div class={formStyle.horizontalRadioInput}>
+        <div class="flex justify-between h-6 gap-2 radio-group-female">
           <input
             type="radio"
             id="female"
@@ -46,7 +47,6 @@ const NodeForm: Component<{
             value="M"
             checked={props.formData.gender === "F"}
             onChange={() => props.updateFormData({ gender: "F" })}
-            class={formStyle.radioInputFemale}
           />
           <Female />
           <label for="female">Female</label>

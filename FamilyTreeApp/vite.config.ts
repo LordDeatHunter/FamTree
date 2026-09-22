@@ -2,11 +2,12 @@ import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import eslint from "vite-plugin-eslint";
 import basicSsl from '@vitejs/plugin-basic-ssl';
+import tailwindcss from "@tailwindcss/vite";
 // import fs from "fs";
 // import path from "path";
 
 export default defineConfig({
-  plugins: [eslint(), solidPlugin(), basicSsl()],
+  plugins: [eslint(), solidPlugin(), basicSsl(), tailwindcss()],
   base: "./",
   build: {
     target: "esnext",

@@ -1,6 +1,5 @@
 import Button1 from "../../assets/tree-structure.svg";
 import { Component, createMemo } from "solid-js";
-import css from "../styles/sidebuttons.module.scss";
 import {
   collapseChildrenNodeStructure,
   collapseParentNodeStructure,
@@ -16,7 +15,7 @@ const SideButtons: Component = () => {
   );
 
   return (
-    <div class={css.sideButtonContainer}>
+    <div class="h-full absolute right-0 flex items-start transition-all duration-300 ease-in-out">
       <img
         src={Button1}
         draggable={false}

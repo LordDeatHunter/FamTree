@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 
-import "./index.scss";
+import "./index.css";
 import App from "./App";
 import "nodeflow-lib";
 

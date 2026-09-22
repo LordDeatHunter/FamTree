@@ -1,7 +1,6 @@
 import { type Component, createMemo, onMount } from "solid-js";
 import { NodeflowData, NodeflowLib, windowSize } from "nodeflow-lib";
-import curveCss from "./styles/curve.module.scss";
-import nodeflowCss from "./styles/nodeflow.module.scss";
+import { newFatherCurve, newMotherCurve } from "./styles/curveClasses";
 import { setupEvents, setupInitialNode } from "./utils";
 import Sidebar from "./components/Sidebar";
 import SidebarContent from "./components/SidebarContent";
@@ -14,6 +13,7 @@ const [nodeflowData, Nodeflow] = NodeflowLib.get().createCanvas(
   {},
   (nf: NodeflowData) => new FTCurveFunctions(nf),
 );
+
 const App: Component = () => {
   onMount(() => {
     setupEvents();
@@ -32,14 +32,14 @@ const App: Component = () => {
     }
 
     return connector.connector.parentNode.customData.gender === "M"
-      ? curveCss.newFatherCurve
-      : curveCss.newMotherCurve;
+      ? newFatherCurve
+      : newMotherCurve;
   });
 
   return (
     <>
       <Nodeflow
-        css={{ newCurve: newCurveCss(), nodeflow: nodeflowCss.nodeflow }}
+        css={{ newCurve: newCurveCss(), nodeflow: "absolute overflow-hidden" }}
         width={`${windowSize().x}px`}
         height={`${windowSize().y}px`}
       />

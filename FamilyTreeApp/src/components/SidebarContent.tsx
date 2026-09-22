@@ -3,7 +3,6 @@ import { createMemo, createSignal, Show } from "solid-js";
 import NodeDataDisplay from "./NodeDataDisplay";
 import NodeFormButtons from "./NodeFormButtons";
 import NodeForm from "./NodeForm";
-import sidebarCss from "../styles/sidebar.module.scss";
 import { nodeflowData } from "../App";
 
 export type FormDataType = CustomNodeflowDataType & { id: string };
@@ -40,7 +39,7 @@ const SidebarContent = () => {
   });
 
   return (
-    <div class={sidebarCss.sidebarContent}>
+    <div class="w-full h-full py-5 flex flex-col items-center">
       <h1>Family Tree</h1>
       <Show when={showForm()} fallback={<h2>No Node Selected</h2>}>
         <Show

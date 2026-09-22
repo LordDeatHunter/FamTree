@@ -1,6 +1,21 @@
 import { NodeflowNodeData, SelectableElementCSS, Vec2 } from "nodeflow-lib";
-import nodeCss from "./styles/node.module.scss";
-import curveCss from "./styles/curve.module.scss";
+import {
+  femaleNode,
+  femaleOutputConnector,
+  inputConnector,
+  inputsSection,
+  maleNode,
+  maleOutputConnector,
+  outputsSection,
+  selectedFemaleNode,
+  selectedMaleNode,
+} from "./styles/nodeClasses";
+import {
+  fatherCurve,
+  motherCurve,
+  selectedFatherCurve,
+  selectedMotherCurve,
+} from "./styles/curveClasses";
 import NodeBody from "./components/NodeBody";
 import {
   createNewMember,
@@ -17,11 +32,9 @@ import { nodeflowData } from "./App";
 const getConnectionCSS = (
   parentGender: CustomNodeflowDataType["gender"],
 ): SelectableElementCSS => ({
-  normal: parentGender == "M" ? curveCss.fatherCurve : curveCss.motherCurve,
+  normal: parentGender == "M" ? fatherCurve : motherCurve,
   selected:
-    parentGender == "M"
-      ? curveCss.selectedFatherCurve
-      : curveCss.selectedMotherCurve,
+    parentGender == "M" ? selectedFatherCurve : selectedMotherCurve,
 });
 
 export const createParentConnections = (
@@ -69,11 +82,8 @@ export const createFamilyMemberNode = (
     {
       id,
       css: {
-        normal: gender === "M" ? nodeCss.maleNode : nodeCss.femaleNode,
-        selected:
-          gender === "M"
-            ? nodeCss.selectedMaleNode
-            : nodeCss.selectedFemaleNode,
+        normal: gender === "M" ? maleNode : femaleNode,
+        selected: gender === "M" ? selectedMaleNode : selectedFemaleNode,
       },
       position,
       customData: { gender, name },
@@ -84,29 +94,26 @@ export const createFamilyMemberNode = (
   );
   const inputSection = newNode.addConnectorSection(
     "inputs",
-    nodeCss.inputsSection,
+    inputsSection,
     historyGroup,
   );
   const outputSection = newNode.addConnectorSection(
     "outputs",
-    nodeCss.outputsSection,
+    outputsSection,
     historyGroup,
   );
 
   outputSection.addConnector(
     {
       id: "O",
-      css:
-        gender === "M"
-          ? nodeCss.maleOutputConnector
-          : nodeCss.femaleOutputConnector,
+      css: gender === "M" ? maleOutputConnector : femaleOutputConnector,
     },
     historyGroup,
   );
   inputSection.addConnector(
     {
       id: "I",
-      css: nodeCss.inputConnector,
+      css: inputConnector,
     },
     historyGroup,
   );

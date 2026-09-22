@@ -1,7 +1,0 @@
-@function darkenAndSaturate($strokeColor, $saturation: 25%, $darkness: 15%) {
-  @return darken(saturate($strokeColor, $saturation), $darkness);
-}
-
-@function lightenAndDesaturate($strokeColor, $saturation: 25%, $lightness: 15%) {
-  @return lighten(desaturate($strokeColor, $saturation), $lightness);
-}
